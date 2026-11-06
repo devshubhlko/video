@@ -424,152 +424,6 @@
               </div>
             </div>
 
-            <!-- Custom Colors: Question Type, Question, Option Text, Shape Fill & Shape Text -->
-            <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-xl space-y-2.5">
-              <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Custom Colors</h4>
-
-              <!-- 1. Question Type Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-700">Type Heading Color</span>
-                  <div class="flex items-center gap-1.5">
-                    <input 
-                      v-model="style.typeColor" 
-                      type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.typeColor }}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <button
-                    v-for="c in ['#000000', '#dc2626', '#2563eb', '#059669', '#d97706', '#7c3aed', '#ffffff']"
-                    :key="'desk-type-c-' + c"
-                    type="button"
-                    @click="style.typeColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.typeColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
-                  ></button>
-                </div>
-              </div>
-
-              <!-- 2. Question Text Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-700">Question Color</span>
-                  <div class="flex items-center gap-1.5">
-                    <input 
-                      v-model="style.questionColor" 
-                      type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.questionColor }}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <button
-                    v-for="c in ['#000000', '#1e293b', '#dc2626', '#2563eb', '#059669', '#d97706', '#ffffff']"
-                    :key="'desk-q-c-' + c"
-                    type="button"
-                    @click="style.questionColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.questionColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
-                  ></button>
-                </div>
-              </div>
-
-              <!-- 3. Option Text Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-700">Option Text Color</span>
-                  <div class="flex items-center gap-1.5">
-                    <input 
-                      v-model="style.optionColor" 
-                      type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.optionColor }}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <button
-                    v-for="c in ['#000000', '#1e293b', '#334155', '#2563eb', '#059669', '#dc2626', '#ffffff']"
-                    :key="'desk-opt-c-' + c"
-                    type="button"
-                    @click="style.optionColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.optionColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
-                  ></button>
-                </div>
-              </div>
-
-              <!-- 4. Option Shape Fill Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="block text-xs font-bold text-slate-700">Option Shape Fill</span>
-                    <span class="text-[10px] text-slate-400">Background of A, B, C, D</span>
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    <input 
-                      v-model="style.optionBadgeBgColor" 
-                      type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.optionBadgeBgColor }}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <button
-                    v-for="c in ['#1f2937', '#000000', '#2563eb', '#059669', '#dc2626', '#d97706', '#7c3aed', '#ffffff']"
-                    :key="'desk-badge-bg-c-' + c"
-                    type="button"
-                    @click="style.optionBadgeBgColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.optionBadgeBgColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
-                  ></button>
-                </div>
-              </div>
-
-              <!-- 5. Option Shape Letter Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="block text-xs font-bold text-slate-700">Option Shape Letter</span>
-                    <span class="text-[10px] text-slate-400">Letter inside shape</span>
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    <input 
-                      v-model="style.optionBadgeTextColor" 
-                      type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.optionBadgeTextColor }}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <button
-                    v-for="c in ['#ffffff', '#000000', '#facc15', '#f87171', '#6ee7b7']"
-                    :key="'desk-badge-text-c-' + c"
-                    type="button"
-                    @click="style.optionBadgeTextColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.optionBadgeTextColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
-                  ></button>
-                </div>
-              </div>
-            </div>
-
             <!-- Drag Switch & Target Selector -->
             <div class="space-y-2 pt-1 border-t border-slate-100">
               <div class="flex items-center justify-between text-xs font-medium text-slate-600">
@@ -588,7 +442,7 @@
                 <label class="block text-[11px] font-bold text-amber-900">
                   Choose Element
                 </label>
-                <div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+                <div class="grid grid-cols-4 gap-1.5">
                   <button
                     type="button"
                     @click="activeDragTarget = 'type'"
@@ -615,16 +469,6 @@
                   </button>
                   <button
                     type="button"
-                    @click="activeDragTarget = 'logo'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'logo' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'"
-                    :disabled="!logoConfig.show"
-                    :title="!logoConfig.show ? 'Logo is OFF' : ''"
-                  >
-                    Logo
-                  </button>
-                  <button
-                    type="button"
                     @click="activeDragTarget = 'watermark'"
                     class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
                     :class="activeDragTarget === 'watermark' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'"
@@ -638,31 +482,30 @@
             </div>
           </div>
 
-          <!-- 4.5 Logo Controls (Upload, Visibility, Size) -->
+          <!-- 5. Watermark Logo Controls (Center Overlay) -->
           <div class="border-t border-slate-100 pt-3 space-y-3">
             <div class="flex items-center justify-between">
               <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <span>Logo</span>
+                Watermark
               </h3>
-              <!-- Yes/No Toggle: Default YES -->
               <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" v-model="logoConfig.show" class="sr-only peer" />
+                <input type="checkbox" v-model="watermark.enabled" class="sr-only peer" />
                 <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-                <span class="ml-2 text-slate-700 text-xs font-bold">{{ logoConfig.show ? 'YES' : 'NO' }}</span>
+                <span class="ml-2 text-slate-700 text-xs font-bold">{{ watermark.enabled ? 'YES' : 'NO' }}</span>
               </label>
             </div>
 
-            <!-- Logo Options Panel (Shown when YES/Active) -->
-            <div v-if="logoConfig.show" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5 transition-all">
-              <!-- Upload / Change Logo Button -->
+            <!-- Watermark Options Panel (Shown only when Yes/Active) -->
+            <div v-if="watermark.enabled" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5 transition-all">
+              <!-- Upload / Change Watermark Logo Button -->
               <div class="bg-white/90 border border-amber-200/70 p-2.5 rounded-xl flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
                   <div class="w-10 h-10 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 p-0.5">
                     <img :src="logoConfig.customUrl || '/logo.png'" alt="Logo Preview" class="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <span class="block text-xs font-bold text-slate-800">Post Logo</span>
-                    <span class="text-[10px] text-slate-500">{{ logoConfig.customUrl ? 'Custom uploaded logo' : 'Default logo' }}</span>
+                    <span class="block text-xs font-bold text-slate-800">Watermark Logo</span>
+                    <span class="text-[10px] text-slate-500">{{ logoConfig.customUrl ? 'Custom logo' : 'Default logo' }}</span>
                   </div>
                 </div>
 
@@ -687,151 +530,6 @@
                 </div>
               </div>
 
-              <!-- Logo Size Slider -->
-              <div class="bg-white/80 border border-amber-200/70 p-2.5 rounded-xl">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
-                  <span class="font-bold">Logo Size</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ logoConfig.size }}px</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="logoConfig.size = Math.max(50, logoConfig.size - 10)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="-10px"
-                  >−</button>
-                  <input 
-                    v-model.number="logoConfig.size"
-                    type="range" 
-                    min="50" 
-                    max="400" 
-                    step="5"
-                    class="w-full"
-                  />
-                  <button 
-                    type="button" 
-                    @click="logoConfig.size = Math.min(400, logoConfig.size + 10)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="+10px"
-                  >+</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 4.6 Background Controls (Solid Color / Custom Image) -->
-          <div class="border-t border-slate-100 pt-3 space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <span>Background</span>
-              </h3>
-              <!-- Mode Tabs: Color vs Image -->
-              <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
-                <button
-                  type="button"
-                  @click="setBgType('color')"
-                  class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer"
-                  :class="bgConfig.type === 'color' ? 'bg-amber-500 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'"
-                >
-                  Color
-                </button>
-                <button
-                  type="button"
-                  @click="setBgType('image')"
-                  class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer"
-                  :class="bgConfig.type === 'image' ? 'bg-amber-500 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'"
-                >
-                  Image
-                </button>
-              </div>
-            </div>
-
-            <!-- Panel for Solid Color -->
-            <div v-if="bgConfig.type === 'color'" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5 transition-all">
-              <div class="bg-white/90 border border-amber-200/70 p-2.5 rounded-xl space-y-2">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-700">Solid Color</span>
-                  <div class="flex items-center gap-2">
-                    <input 
-                      v-model="bgConfig.color" 
-                      type="color" 
-                      class="w-7 h-7 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-xs font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ bgConfig.color }}</span>
-                  </div>
-                </div>
-
-                <!-- Preset Color Swatches -->
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <div class="flex items-center gap-1.5 flex-wrap">
-                    <button
-                      v-for="c in ['#ffffff', '#fafaf9', '#f1f5f9', '#fefce8', '#f0fdf4', '#fff1f2', '#1e293b']"
-                      :key="c"
-                      type="button"
-                      @click="bgConfig.color = c"
-                      class="w-6 h-6 rounded-md border transition-all cursor-pointer shadow-2xs hover:scale-110"
-                      :class="bgConfig.color.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-105' : 'border-slate-300'"
-                      :style="{ backgroundColor: c }"
-                      :title="c === '#ffffff' ? 'Pure White (Default)' : c"
-                    ></button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Panel for Background Image -->
-            <div v-else class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5 transition-all">
-              <div class="bg-white/90 border border-amber-200/70 p-2.5 rounded-xl flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-12 h-10 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
-                    <img v-if="bgConfig.imageUrl" :src="bgConfig.imageUrl" alt="BG Preview" class="w-full h-full object-cover" />
-                    <span v-else class="text-[10px] text-slate-400 font-bold">No Image</span>
-                  </div>
-                  <div>
-                    <span class="block text-xs font-bold text-slate-800">Background Image</span>
-                    <span class="text-[10px] text-slate-500">{{ bgConfig.imageUrl ? 'Custom image applied' : 'Upload any image for BG' }}</span>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-1.5">
-                  <button 
-                    type="button" 
-                    @click="triggerBgUpload" 
-                    class="py-1.5 px-2.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all shadow-xs cursor-pointer flex items-center gap-1"
-                  >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    <span>{{ bgConfig.imageUrl ? 'Change' : 'Upload' }}</span>
-                  </button>
-                  <button 
-                    v-if="bgConfig.imageUrl" 
-                    type="button" 
-                    @click="removeBgImage" 
-                    class="py-1.5 px-2 rounded-lg text-[11px] font-medium text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 transition-all cursor-pointer"
-                    title="Remove background image"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 5. Watermark Logo Controls (Center Overlay) -->
-          <div class="border-t border-slate-100 pt-3 space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                Watermark
-              </h3>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" v-model="watermark.enabled" class="sr-only peer" />
-                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-                <span class="ml-2 text-slate-700 text-xs font-bold">{{ watermark.enabled ? 'YES' : 'NO' }}</span>
-              </label>
-            </div>
-
-            <!-- Watermark Options Panel (Shown only when Yes/Active) -->
-            <div v-if="watermark.enabled" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5 transition-all">
               <div class="space-y-2.5">
                 <!-- Watermark Opacity Slider -->
                 <div class="bg-white/80 border border-amber-200/70 p-2.5 rounded-xl">
@@ -1097,8 +795,8 @@
               <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Select Size To Adjust</span>
             </div>
 
-            <!-- 5-Pill Size Target Selector -->
-            <div class="grid grid-cols-5 gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 text-center">
+            <!-- 4-Pill Size Target Selector -->
+            <div class="grid grid-cols-4 gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 text-center">
               <button 
                 type="button" 
                 @click="activeSizeTarget = 'border'"
@@ -1130,14 +828,6 @@
                 :class="activeSizeTarget === 'option' ? 'bg-amber-500 text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-slate-900'"
               >
                 Option
-              </button>
-              <button 
-                type="button" 
-                @click="activeSizeTarget = 'logo'"
-                class="py-2 px-1 text-xs font-bold rounded-lg transition-all cursor-pointer"
-                :class="activeSizeTarget === 'logo' ? 'bg-amber-500 text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-slate-900'"
-              >
-                Logo
               </button>
             </div>
 
@@ -1250,34 +940,6 @@
                   <button 
                     type="button" 
                     @click="style.optionFontSize = Math.min(46, style.optionFontSize + 2)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >+</button>
-                </div>
-              </div>
-
-              <!-- Logo Size Slider -->
-              <div v-show="activeSizeTarget === 'logo'">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-2">
-                  <span class="font-bold">Logo Size</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ logoConfig.size }}px</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="logoConfig.size = Math.max(50, logoConfig.size - 10)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >−</button>
-                  <input 
-                    v-model.number="logoConfig.size"
-                    type="range" 
-                    min="50" 
-                    max="400" 
-                    step="5"
-                    class="w-full"
-                  />
-                  <button 
-                    type="button" 
-                    @click="logoConfig.size = Math.min(400, logoConfig.size + 10)" 
                     class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
                   >+</button>
                 </div>
@@ -1503,7 +1165,7 @@
 
               <div v-if="enableDrag" class="bg-amber-50/80 border border-amber-200 p-2.5 rounded-xl space-y-1.5">
                 <label class="block text-[11px] font-bold text-amber-900">Choose Element</label>
-                <div class="grid grid-cols-3 gap-1.5">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                   <button
                     type="button"
                     @click="activeDragTarget = 'type'"
@@ -1524,13 +1186,6 @@
                   >Options</button>
                   <button
                     type="button"
-                    @click="activeDragTarget = 'logo'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'logo' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200'"
-                    :disabled="!logoConfig.show"
-                  >Logo</button>
-                  <button
-                    type="button"
                     @click="activeDragTarget = 'watermark'"
                     class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
                     :class="activeDragTarget === 'watermark' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200'"
@@ -1540,26 +1195,26 @@
               </div>
             </div>
 
-            <!-- Logo Controls -->
+            <!-- Watermark Controls -->
             <div class="border-t border-slate-100 pt-3 space-y-3">
               <div class="flex items-center justify-between">
-                <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Logo</h3>
+                <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Watermark</h3>
                 <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" v-model="logoConfig.show" class="sr-only peer" />
+                  <input type="checkbox" v-model="watermark.enabled" class="sr-only peer" />
                   <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-                  <span class="ml-2 text-slate-700 text-xs font-bold">{{ logoConfig.show ? 'YES' : 'NO' }}</span>
+                  <span class="ml-2 text-slate-700 text-xs font-bold">{{ watermark.enabled ? 'YES' : 'NO' }}</span>
                 </label>
               </div>
 
-              <div v-if="logoConfig.show" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5">
-                <!-- Upload / Change Logo Button -->
+              <div v-if="watermark.enabled" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5">
+                <!-- Upload / Change Watermark Logo Button -->
                 <div class="bg-white/90 border border-amber-200/70 p-2 rounded-xl flex items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <div class="w-9 h-9 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 p-0.5">
                       <img :src="logoConfig.customUrl || '/logo.png'" alt="Logo Preview" class="w-full h-full object-contain" />
                     </div>
                     <div>
-                      <span class="block text-xs font-bold text-slate-800">Post Logo</span>
+                      <span class="block text-xs font-bold text-slate-800">Watermark Logo</span>
                       <span class="text-[10px] text-slate-500">{{ logoConfig.customUrl ? 'Custom' : 'Default' }}</span>
                     </div>
                   </div>
@@ -1584,136 +1239,6 @@
                   </div>
                 </div>
 
-                <!-- Logo Size Slider -->
-                <div class="bg-white/80 border border-amber-200/70 p-2 rounded-xl">
-                  <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1">
-                    <span class="font-bold">Logo Size</span>
-                    <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ logoConfig.size }}px</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button 
-                      type="button" 
-                      @click="logoConfig.size = Math.max(50, logoConfig.size - 10)" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90"
-                    >−</button>
-                    <input 
-                      v-model.number="logoConfig.size"
-                      type="range" 
-                      min="50" 
-                      max="400" 
-                      step="5"
-                      class="w-full"
-                    />
-                    <button 
-                      type="button" 
-                      @click="logoConfig.size = Math.min(400, logoConfig.size + 10)" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90"
-                    >+</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Background Controls (Mobile) -->
-            <div class="border-t border-slate-100 pt-3 space-y-3">
-              <div class="flex items-center justify-between">
-                <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Background</h3>
-                <!-- Mode Tabs: Color vs Image -->
-                <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
-                  <button
-                    type="button"
-                    @click="setBgType('color')"
-                    class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer"
-                    :class="bgConfig.type === 'color' ? 'bg-amber-500 text-white shadow-2xs' : 'text-slate-600'"
-                  >Color</button>
-                  <button
-                    type="button"
-                    @click="setBgType('image')"
-                    class="px-2.5 py-1 rounded-md text-[11px] font-bold transition-all cursor-pointer"
-                    :class="bgConfig.type === 'image' ? 'bg-amber-500 text-white shadow-2xs' : 'text-slate-600'"
-                  >Image</button>
-                </div>
-              </div>
-
-              <!-- Mobile Solid Color Panel -->
-              <div v-if="bgConfig.type === 'color'" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5">
-                <div class="bg-white/90 border border-amber-200/70 p-2.5 rounded-xl space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-700">Solid Color</span>
-                    <div class="flex items-center gap-2">
-                      <input 
-                        v-model="bgConfig.color" 
-                        type="color" 
-                        class="w-7 h-7 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                      />
-                      <span class="font-mono text-xs font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ bgConfig.color }}</span>
-                    </div>
-                  </div>
-
-                  <!-- Presets -->
-                  <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                    <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                    <button
-                      v-for="c in ['#ffffff', '#fafaf9', '#f1f5f9', '#fefce8', '#f0fdf4', '#fff1f2', '#1e293b']"
-                      :key="'mob-bg-' + c"
-                      type="button"
-                      @click="bgConfig.color = c"
-                      class="w-6 h-6 rounded-md border transition-all cursor-pointer shadow-2xs"
-                      :class="bgConfig.color.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-105' : 'border-slate-300'"
-                      :style="{ backgroundColor: c }"
-                    ></button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Mobile Background Image Panel -->
-              <div v-else class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5">
-                <div class="bg-white/90 border border-amber-200/70 p-2 rounded-xl flex items-center justify-between gap-2">
-                  <div class="flex items-center gap-2">
-                    <div class="w-12 h-10 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
-                      <img v-if="bgConfig.imageUrl" :src="bgConfig.imageUrl" alt="BG Preview" class="w-full h-full object-cover" />
-                      <span v-else class="text-[10px] text-slate-400 font-bold">No Image</span>
-                    </div>
-                    <div>
-                      <span class="block text-xs font-bold text-slate-800">Background Image</span>
-                      <span class="text-[10px] text-slate-500">{{ bgConfig.imageUrl ? 'Custom image' : 'No image' }}</span>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center gap-1.5">
-                    <button 
-                      type="button" 
-                      @click="triggerBgUpload" 
-                      class="py-1.5 px-2.5 rounded-lg text-xs font-bold bg-amber-500 text-white shadow-xs cursor-pointer flex items-center gap-1"
-                    >
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                      <span>{{ bgConfig.imageUrl ? 'Change' : 'Upload' }}</span>
-                    </button>
-                    <button 
-                      v-if="bgConfig.imageUrl" 
-                      type="button" 
-                      @click="removeBgImage" 
-                      class="py-1.5 px-2 rounded-lg text-[11px] font-medium text-slate-500 hover:text-rose-600 border border-slate-200"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Watermark Controls -->
-            <div class="border-t border-slate-100 pt-3 space-y-3">
-              <div class="flex items-center justify-between">
-                <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Watermark</h3>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" v-model="watermark.enabled" class="sr-only peer" />
-                  <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-                  <span class="ml-2 text-slate-700 text-xs font-bold">{{ watermark.enabled ? 'YES' : 'NO' }}</span>
-                </label>
-              </div>
-
-              <div v-if="watermark.enabled" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5">
                 <!-- Watermark Opacity Slider -->
                 <div class="bg-white/80 border border-amber-200/70 p-2 rounded-xl">
                   <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1">
@@ -2072,14 +1597,7 @@
       </div>
     </div>
 
-    <!-- Global hidden file inputs for background image & custom logo -->
-    <input 
-      type="file" 
-      ref="bgFileInput" 
-      accept="image/*" 
-      @change="onBgFileChange" 
-      class="hidden" 
-    />
+    <!-- Global hidden file input for custom watermark logo -->
     <input 
       type="file" 
       ref="logoFileInput" 
@@ -2104,7 +1622,7 @@ const activeTab = ref<'question' | 'settings'>('question');
 
 // Mobile Navigation State ('size' | 'qa' | 'settings')
 const mobileTab = ref<'size' | 'qa' | 'settings'>('qa');
-const activeSizeTarget = ref<'border' | 'type' | 'question' | 'option' | 'logo'>('type');
+const activeSizeTarget = ref<'border' | 'type' | 'question' | 'option'>('type');
 
 const currentDimensions = computed(() => {
   if (selectedRatio.value === '9:16') {
@@ -2597,18 +2115,11 @@ async function deleteAssetFromStorage(key: string): Promise<void> {
   } catch (_) {}
 }
 
-// Top Logo Model (Upload, Toggle YES/NO, Custom Size, Draggable)
-const savedLogoShow = localStorage.getItem('quiz_logo_show');
+// Custom Logo Model (Watermark asset)
 const logoConfig = reactive({
-  show: savedLogoShow !== null ? savedLogoShow === 'true' : false, // Default: NO (side logo removed, watermark kept)
-  size: 160,            // Default: 160px
+  show: false, // Corner Post Logo system removed
+  size: 160,
   customUrl: ''
-});
-
-watch(() => logoConfig.show, (newVal) => {
-  try {
-    localStorage.setItem('quiz_logo_show', String(newVal));
-  } catch (_) {}
 });
 
 const logoFileInput = ref<HTMLInputElement | null>(null);
@@ -2653,71 +2164,12 @@ async function resetLogoToDefault() {
   img.src = '/logo.png';
 }
 
-// Background Model (Solid Color or Uploaded Custom Image)
+// Background Model (Clean Solid White)
 const bgConfig = reactive({
   type: 'color' as 'color' | 'image',
   color: '#ffffff',
   imageUrl: ''
 });
-
-let bgImg: HTMLImageElement | null = null;
-const bgFileInput = ref<HTMLInputElement | null>(null);
-
-function setBgType(type: 'color' | 'image') {
-  bgConfig.type = type;
-  try {
-    localStorage.setItem('quiz_bg_type', type);
-  } catch (_) {}
-  if (type === 'image' && !bgConfig.imageUrl) {
-    triggerBgUpload();
-  }
-}
-
-function triggerBgUpload() {
-  bgFileInput.value?.click();
-}
-
-async function onBgFileChange(e: Event) {
-  const target = e.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = async (event) => {
-    const result = event.target?.result as string;
-    if (!result) return;
-    
-    // Save image to IndexedDB (cleanly overwrites/replaces previously stored background image)
-    await saveAssetToStorage('bg_image', result);
-
-    bgConfig.imageUrl = result;
-    bgConfig.type = 'image';
-    try {
-      localStorage.setItem('quiz_bg_type', 'image');
-    } catch (_) {}
-
-    const img = new Image();
-    img.onload = () => {
-      bgImg = img;
-      renderCanvas(-1, 4, 0.0, false, false, 1.0);
-    };
-    img.src = result;
-  };
-  reader.readAsDataURL(file);
-  target.value = '';
-}
-
-async function removeBgImage() {
-  // Completely delete background image from persistent storage
-  await deleteAssetFromStorage('bg_image');
-  bgConfig.imageUrl = '';
-  bgConfig.type = 'color';
-  bgImg = null;
-  try {
-    localStorage.setItem('quiz_bg_type', 'color');
-  } catch (_) {}
-  renderCanvas(-1, 4, 0.0, false, false, 1.0);
-}
 
 // Watermark Logo Model
 const watermark = reactive({
@@ -2747,7 +2199,7 @@ const offsets = reactive({
 });
 
 const enableDrag = ref(false);
-type DragTarget = 'type' | 'question' | 'options' | 'logo' | 'watermark';
+type DragTarget = 'type' | 'question' | 'options' | 'watermark';
 const activeDragTarget = ref<DragTarget>('type');
 const isDragging = ref(false);
 let dragStartX = 0;
@@ -2799,28 +2251,9 @@ onMounted(async () => {
     logoImg.src = '/logo.png';
   }
 
-  // 2. Restore Background Image if previously saved in IndexedDB
-  const savedBg = await getAssetFromStorage('bg_image');
-  if (savedBg) {
-    bgConfig.imageUrl = savedBg;
-    const savedType = localStorage.getItem('quiz_bg_type');
-    if (savedType === 'image') {
-      bgConfig.type = 'image';
-    }
-    bgImg = new Image();
-    bgImg.src = savedBg;
-  }
-
-  // Restore saved solid bg color if previously chosen
-  const savedColor = localStorage.getItem('quiz_bg_color');
-  if (savedColor) {
-    bgConfig.color = savedColor;
-  }
-
-  // Safely wait for images & fonts without blocking or hanging
+  // Safely wait for logo & fonts without blocking or hanging
   await Promise.allSettled([
     waitForImg(logoImg),
-    waitForImg(bgImg),
     Promise.race([
       document.fonts?.ready ?? Promise.resolve(),
       new Promise((resolve) => setTimeout(resolve, 1000))
@@ -2833,13 +2266,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', onWindowScroll);
-});
-
-// Watch bg color to persist in localStorage
-watch(() => bgConfig.color, (newColor) => {
-  try {
-    localStorage.setItem('quiz_bg_color', newColor);
-  } catch (_) {}
 });
 
 // Watch inputs to re-render in real-time
@@ -3144,34 +2570,9 @@ function renderCanvasToCtx(
   const H = targetCanvas.height;
   const curQuiz = targetQuiz || quizList[activeQuestionIndex.value] || quizList[0];
 
-  // 1. Canvas Background (Solid Color or Uploaded Image)
-  if (bgConfig.type === 'image' && bgImg && bgImg.complete && bgImg.naturalWidth > 0) {
-    // Fallback solid base
-    ctx.fillStyle = bgConfig.color || '#ffffff';
-    ctx.fillRect(0, 0, W, H);
-
-    // Draw background image with aspect cover (fills full canvas perfectly without distortion)
-    ctx.save();
-    const imgW = bgImg.naturalWidth;
-    const imgH = bgImg.naturalHeight;
-    const canvasAspect = W / H;
-    const imgAspect = imgW / imgH;
-
-    let sx = 0, sy = 0, sW = imgW, sH = imgH;
-    if (imgAspect > canvasAspect) {
-      sW = imgH * canvasAspect;
-      sx = (imgW - sW) / 2;
-    } else {
-      sH = imgW / canvasAspect;
-      sy = (imgH - sH) / 2;
-    }
-    ctx.drawImage(bgImg, sx, sy, sW, sH, 0, 0, W, H);
-    ctx.restore();
-  } else {
-    // Solid Color (Default: #ffffff)
-    ctx.fillStyle = bgConfig.color || '#ffffff';
-    ctx.fillRect(0, 0, W, H);
-  }
+  // 1. Canvas Background (Clean White)
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
 
   // 2. Outer Black Frame Border (Drawn only if borderWidth > 0)
   const bw = Math.max(0, style.borderWidth);
@@ -3219,28 +2620,7 @@ function renderCanvasToCtx(
   ctx.fillText(categoryText, typeBaseX, typeBaseY);
   ctx.restore();
 
-  // 4. Logo (Top-Right Default, Drag Anywhere, Configurable Size & Visibility)
-  if (logoConfig.show && logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
-    ctx.save();
-    const maxDim = logoConfig.size;
-    const aspect = logoImg.naturalWidth / logoImg.naturalHeight;
-    let logoW = maxDim;
-    let logoH = maxDim;
-    if (aspect > 1) {
-      logoW = maxDim;
-      logoH = maxDim / aspect;
-    } else {
-      logoH = maxDim;
-      logoW = maxDim * aspect;
-    }
 
-    const baseLogoX = W - logoW - (isLandscape ? 40 : 55);
-    const baseLogoY = isReel ? 95 : isLandscape ? 25 : 32;
-    const logoX = baseLogoX + offsets.logoX;
-    const logoY = baseLogoY + offsets.logoY;
-    ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
-    ctx.restore();
-  }
 
   // 5. Question Section (Directly visible, no animation or typewriter)
   const questionBaseX = W / 2 + offsets.questionX;
@@ -3431,9 +2811,6 @@ function startDragging(clientX: number, clientY: number) {
   } else if (activeDragTarget.value === 'options') {
     initialTargetX = offsets.optionsX;
     initialTargetY = offsets.optionsY;
-  } else if (activeDragTarget.value === 'logo') {
-    initialTargetX = offsets.logoX;
-    initialTargetY = offsets.logoY;
   } else if (activeDragTarget.value === 'watermark') {
     initialTargetX = watermark.offsetX;
     initialTargetY = watermark.offsetY;
@@ -3458,9 +2835,6 @@ function moveDragging(clientX: number, clientY: number) {
   } else if (activeDragTarget.value === 'options') {
     offsets.optionsX = initialTargetX + deltaX;
     offsets.optionsY = initialTargetY + deltaY;
-  } else if (activeDragTarget.value === 'logo') {
-    offsets.logoX = initialTargetX + deltaX;
-    offsets.logoY = initialTargetY + deltaY;
   } else if (activeDragTarget.value === 'watermark') {
     watermark.offsetX = initialTargetX + deltaX;
     watermark.offsetY = initialTargetY + deltaY;
