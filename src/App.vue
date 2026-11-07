@@ -8,17 +8,32 @@
         </div>
       </div>
 
-      <!-- Ratio Quick Switcher in Header -->
-      <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+      <!-- Header Controls: Global Drag Mode & Aspect Ratio Switcher -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Global Drag Mode Button -->
         <button 
-          v-for="r in ['1:1', '9:16', '16:9']" 
-          :key="r"
-          @click="changeAspectRatio(r as any)"
-          class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer"
-          :class="selectedRatio === r ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
-        >
-          {{ r === '1:1' ? 'Square' : r === '9:16' ? 'Reel' : 'Youtube' }} 
-        </button> 
+          type="button"
+          @click="enableDrag = !enableDrag"
+          class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs active:scale-95"
+          :class="enableDrag 
+            ? 'bg-amber-500 text-white border-amber-600 ring-2 ring-amber-400/40 shadow-amber-500/20 font-black' 
+            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300'"
+          title="Drag Mode: Click & drag any element directly on the canvas">
+          <span class="inline">Drag Mode</span>
+        </button>
+
+        <!-- Ratio Quick Switcher in Header -->
+        <div class="flex items-center gap-1 sm:gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <button 
+            v-for="r in ['1:1', '9:16', '16:9']" 
+            :key="r"
+            @click="changeAspectRatio(r as any)"
+            class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer"
+            :class="selectedRatio === r ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+          >
+            {{ r === '1:1' ? 'Square' : r === '9:16' ? 'Reel' : 'Youtube' }} 
+          </button> 
+        </div>
       </div>
     </header>
 
@@ -271,126 +286,236 @@
               </button>
             </div>
 
-            <!-- All Sliders: 1 Per Line, Full Width, Thick with Touch Stepper Buttons -->
-            <div class="space-y-2.5">
-              <!-- Border Width Slider -->
-              <div class="bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
-                  <span class="font-bold">Border Width</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ style.borderWidth }}px</span>
+            <!-- Color Theme (Globally Applies to Border, Type, Question, Option, Option Badge Shape) -->
+            <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-xl space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h2.586a1 1 0 00.707-.293l5.414-5.414a2 2 0 012.828 0l1.414 1.414a2 2 0 010 2.828l-5.414 5.414a1 1 0 00-.293.707V17a4 4 0 01-4 4H7z" />
+                    </svg>
+                    <span>Color Theme</span>
+                  </span>
+                  <span class="text-[10px] text-slate-500 block">Border, Type, Question, Options & Badges</span>
                 </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="style.borderWidth = Math.max(0, style.borderWidth - 1)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="-1px"
-                  >−</button>
+                <div class="flex items-center gap-1.5">
                   <input 
-                    v-model.number="style.borderWidth"
-                    type="range" 
-                    min="0" 
-                    max="10" 
-                    step="1"
-                    class="w-full"
+                    type="color" 
+                    :value="themeColor" 
+                    @input="applyThemeColor(($event.target as HTMLInputElement).value)" 
+                    class="w-7 h-7 rounded-lg border border-slate-300 cursor-pointer p-0.5 bg-white shadow-2xs"
+                    title="Pick Any Custom Theme Color"
                   />
+                  <span class="font-mono text-[10px] font-bold text-slate-600 bg-white px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ themeColor }}</span>
+                </div>
+              </div>
+
+              <!-- Color Theme Presets Row -->
+              <div class="flex items-center gap-1.5 pt-1 border-t border-slate-200/70 flex-wrap">
+                <button
+                  v-for="th in [
+                    { name: 'Black', color: '#000000' },
+                    { name: 'Navy', color: '#1d4ed8' },
+                    { name: 'Red', color: '#dc2626' },
+                    { name: 'Emerald', color: '#059669' },
+                    { name: 'Amber', color: '#d97706' },
+                    { name: 'Purple', color: '#7c3aed' },
+                    { name: 'Rose', color: '#db2777' },
+                    { name: 'Teal', color: '#0f766e' },
+                    { name: 'Slate', color: '#334155' }
+                  ]"
+                  :key="'dt-th-' + th.color"
+                  type="button"
+                  @click="applyThemeColor(th.color)"
+                  class="w-6 h-6 rounded-lg border transition-all cursor-pointer shadow-2xs hover:scale-105"
+                  :class="themeColor.toLowerCase() === th.color.toLowerCase() ? 'ring-2 ring-amber-500 scale-110 shadow-xs' : 'border-slate-300'"
+                  :style="{ backgroundColor: th.color }"
+                  :title="th.name + ' (' + th.color + ')'"
+                ></button>
+              </div>
+            </div>
+
+            <!-- Background Config Card (Solid Color Default White or Custom Uploaded Image) -->
+            <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-xl space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Background</span>
+                  </span>
+                  <span class="text-[10px] text-slate-500 block">{{ bgConfig.type === 'image' && bgConfig.imageUrl ? 'Custom Image Active' : 'Solid Color Active' }}</span>
+                </div>
+
+                <!-- Hidden file input for BG upload -->
+                <input 
+                  ref="bgFileInput" 
+                  type="file" 
+                  accept="image/*" 
+                  class="hidden" 
+                  @change="onBgFileChange" 
+                />
+
+                <div class="flex items-center gap-1.5">
                   <button 
                     type="button" 
-                    @click="style.borderWidth = Math.min(10, style.borderWidth + 1)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="+1px"
-                  >+</button>
+                    @click="bgConfig.type = 'color'" 
+                    class="px-2 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer"
+                    :class="bgConfig.type === 'color' ? 'bg-amber-500 text-white border-amber-600 shadow-2xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                  >
+                    Solid Color
+                  </button>
+                  <button 
+                    type="button" 
+                    @click="triggerBgImageUpload" 
+                    class="px-2 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer flex items-center gap-1"
+                    :class="bgConfig.type === 'image' && bgConfig.imageUrl ? 'bg-amber-500 text-white border-amber-600 shadow-2xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    <span>Upload Image</span>
+                  </button>
                 </div>
+              </div>
+
+              <!-- Solid Color Controls (When type === 'color') -->
+              <div v-if="bgConfig.type === 'color'" class="space-y-2 pt-1 border-t border-slate-200/70">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold text-slate-700">Solid Color:</span>
+                  <div class="flex items-center gap-1.5">
+                    <input 
+                      v-model="bgConfig.color" 
+                      type="color" 
+                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-white" 
+                      title="Pick Custom BG Color"
+                    />
+                    <span class="font-mono text-[10px] font-bold text-slate-600 bg-white px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ bgConfig.color }}</span>
+                    <button 
+                      v-if="bgConfig.color.toLowerCase() !== '#ffffff'" 
+                      type="button" 
+                      @click="resetBgToWhite" 
+                      class="text-[10px] font-bold text-amber-600 hover:text-amber-700 underline cursor-pointer ml-1"
+                    >
+                      Default White
+                    </button>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    v-for="bgC in [
+                      { name: 'White', color: '#ffffff' },
+                      { name: 'Off-White', color: '#f8fafc' },
+                      { name: 'Cream', color: '#fefce8' },
+                      { name: 'Soft Amber', color: '#fffbeb' },
+                      { name: 'Mint', color: '#f0fdf4' },
+                      { name: 'Sky', color: '#eff6ff' },
+                      { name: 'Rose', color: '#fdf2f8' },
+                      { name: 'Dark Slate', color: '#0f172a' }
+                    ]"
+                    :key="'bg-c-' + bgC.color"
+                    type="button"
+                    @click="bgConfig.color = bgC.color; bgConfig.type = 'color'"
+                    class="w-6 h-6 rounded-lg border transition-all cursor-pointer shadow-2xs hover:scale-105"
+                    :class="bgConfig.color.toLowerCase() === bgC.color.toLowerCase() ? 'ring-2 ring-amber-500 scale-110 shadow-xs' : 'border-slate-300'"
+                    :style="{ backgroundColor: bgC.color }"
+                    :title="bgC.name + ' (' + bgC.color + ')'"
+                  ></button>
+                </div>
+              </div>
+
+              <!-- Image Mode Preview & Actions -->
+              <div v-else class="space-y-2 pt-1 border-t border-slate-200/70">
+                <div v-if="bgConfig.imageUrl" class="flex items-center justify-between gap-3 bg-white p-2 rounded-lg border border-slate-200">
+                  <div class="flex items-center gap-2 overflow-hidden">
+                    <img :src="bgConfig.imageUrl" alt="BG Preview" class="w-12 h-8 object-cover rounded border border-slate-200 shrink-0" />
+                    <span class="text-xs font-semibold text-slate-700 truncate">Background Image</span>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <button 
+                      type="button" 
+                      @click="triggerBgImageUpload" 
+                      class="text-[11px] font-bold text-amber-600 hover:text-amber-700 px-2 py-1 rounded bg-amber-50 cursor-pointer"
+                    >
+                      Change
+                    </button>
+                    <button 
+                      type="button" 
+                      @click="removeBgImage" 
+                      class="text-[11px] font-bold text-rose-600 hover:text-rose-700 px-2 py-1 rounded bg-rose-50 cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+                <div v-else class="text-center py-3 bg-white rounded-lg border border-dashed border-slate-300">
+                  <button 
+                    type="button" 
+                    @click="triggerBgImageUpload" 
+                    class="text-xs font-bold text-amber-600 hover:text-amber-700 cursor-pointer"
+                  >
+                    + Upload background image from device
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- All Sliders: Single-Line Compact Rows -->
+            <div class="space-y-2">
+              <!-- Border Width Slider -->
+              <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Border Width</span>
+                <input 
+                  v-model.number="style.borderWidth"
+                  type="range" 
+                  min="0" 
+                  max="10" 
+                  step="1"
+                  :title="style.borderWidth + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
               </div>
 
               <!-- Type Font Size Slider -->
-              <div class="bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
-                  <span class="font-bold">Type Size</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ style.typeFontSize }}px</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="style.typeFontSize = Math.max(24, style.typeFontSize - 2)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="-2px"
-                  >−</button>
-                  <input 
-                    v-model.number="style.typeFontSize"
-                    type="range" 
-                    min="24" 
-                    max="68" 
-                    step="2"
-                    class="w-full"
-                  />
-                  <button 
-                    type="button" 
-                    @click="style.typeFontSize = Math.min(68, style.typeFontSize + 2)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="+2px"
-                  >+</button>
-                </div>
+              <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Type Size</span>
+                <input 
+                  v-model.number="style.typeFontSize"
+                  type="range" 
+                  min="24" 
+                  max="68" 
+                  step="2"
+                  :title="style.typeFontSize + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
               </div>
 
               <!-- Question Size Slider -->
-              <div class="bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
-                  <span class="font-bold">Question Size</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ style.questionFontSize }}px</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="style.questionFontSize = Math.max(28, style.questionFontSize - 2)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="-2px"
-                  >−</button>
-                  <input 
-                    v-model.number="style.questionFontSize"
-                    type="range" 
-                    min="28" 
-                    max="68" 
-                    step="2"
-                    class="w-full"
-                  />
-                  <button 
-                    type="button" 
-                    @click="style.questionFontSize = Math.min(68, style.questionFontSize + 2)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="+2px"
-                  >+</button>
-                </div>
+              <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Question Size</span>
+                <input 
+                  v-model.number="style.questionFontSize"
+                  type="range" 
+                  min="28" 
+                  max="68" 
+                  step="2"
+                  :title="style.questionFontSize + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
               </div>
 
               <!-- Option Text Size Slider -->
-              <div class="bg-slate-50 border border-slate-200/80 p-2.5 rounded-xl">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
-                  <span class="font-bold">Option Size</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ style.optionFontSize }}px</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="style.optionFontSize = Math.max(20, style.optionFontSize - 2)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="-2px"
-                  >−</button>
-                  <input 
-                    v-model.number="style.optionFontSize"
-                    type="range" 
-                    min="20" 
-                    max="46" 
-                    step="2"
-                    class="w-full"
-                  />
-                  <button 
-                    type="button" 
-                    @click="style.optionFontSize = Math.min(46, style.optionFontSize + 2)" 
-                    class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                    title="+2px"
-                  >+</button>
-                </div>
+              <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Option Size</span>
+                <input 
+                  v-model.number="style.optionFontSize"
+                  type="range" 
+                  min="20" 
+                  max="46" 
+                  step="2"
+                  :title="style.optionFontSize + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
               </div>
             </div>
 
@@ -424,10 +549,13 @@
               </div>
             </div>
 
-            <!-- Drag Switch & Target Selector -->
-            <div class="space-y-2 pt-1 border-t border-slate-100">
+            <!-- Drag Switch (Global - Drag Any Element) -->
+            <div class="space-y-1.5 pt-1 border-t border-slate-100">
               <div class="flex items-center justify-between text-xs font-medium text-slate-600">
                 <span class="flex items-center gap-1.5 font-bold">
+                  <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V4a1.5 1.5 0 013 0v4.5m0 0a1.5 1.5 0 013 0V9a1.5 1.5 0 013 0v3.5" />
+                  </svg>
                   <span>Drag Mode</span>
                 </span>
                 <label class="relative inline-flex items-center cursor-pointer">
@@ -436,75 +564,35 @@
                   <span class="ml-2 text-slate-700 text-xs font-bold">{{ enableDrag ? 'ON' : 'OFF' }}</span>
                 </label>
               </div>
-
-              <!-- Drag Target Pills (Only active element can be dragged) -->
-              <div v-if="enableDrag" class="bg-amber-50/80 border border-amber-200 p-2.5 rounded-xl space-y-1.5 transition-all">
-                <label class="block text-[11px] font-bold text-amber-900">
-                  Choose Element
-                </label>
-                <div class="grid grid-cols-4 gap-1.5">
-                  <button
-                    type="button"
-                    @click="activeDragTarget = 'type'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'type' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'"
-                  >
-                    Type
-                  </button>
-                  <button
-                    type="button"
-                    @click="activeDragTarget = 'question'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'question' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'"
-                  >
-                    Question
-                  </button>
-                  <button
-                    type="button"
-                    @click="activeDragTarget = 'options'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'options' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'"
-                  >
-                    Options
-                  </button>
-                  <button
-                    type="button"
-                    @click="activeDragTarget = 'watermark'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'watermark' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'"
-                    :disabled="!watermark.enabled"
-                    :title="!watermark.enabled ? 'Watermark is OFF' : ''"
-                  >
-                    Watermark
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
-          <!-- 5. Watermark Logo Controls (Center Overlay) -->
+           <!-- 6. Channel Logo Controls (Image Logo, Default OFF, Draggable) -->
           <div class="border-t border-slate-100 pt-3 space-y-3">
             <div class="flex items-center justify-between">
               <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                Watermark
+                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span>Logo</span>
               </h3>
               <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" v-model="watermark.enabled" class="sr-only peer" />
+                <input type="checkbox" v-model="logoConfig.enabled" class="sr-only peer" />
                 <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-                <span class="ml-2 text-slate-700 text-xs font-bold">{{ watermark.enabled ? 'YES' : 'NO' }}</span>
+                <span class="ml-2 text-slate-700 text-xs font-bold">{{ logoConfig.enabled ? 'ON' : 'OFF' }}</span>
               </label>
             </div>
 
-            <!-- Watermark Options Panel (Shown only when Yes/Active) -->
-            <div v-if="watermark.enabled" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5 transition-all">
-              <!-- Upload / Change Watermark Logo Button -->
+            <!-- Logo Options Panel (Shown only when ON) -->
+            <div v-if="logoConfig.enabled" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-3 transition-all">
+              <!-- Upload / Change Logo Button -->
               <div class="bg-white/90 border border-amber-200/70 p-2.5 rounded-xl flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
                   <div class="w-10 h-10 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 p-0.5">
                     <img :src="logoConfig.customUrl || '/logo.png'" alt="Logo Preview" class="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <span class="block text-xs font-bold text-slate-800">Watermark Logo</span>
+                    <span class="block text-xs font-bold text-slate-800">Channel Logo</span>
                     <span class="text-[10px] text-slate-500">{{ logoConfig.customUrl ? 'Custom logo' : 'Default logo' }}</span>
                   </div>
                 </div>
@@ -513,7 +601,7 @@
                   <button 
                     type="button" 
                     @click="triggerLogoUpload" 
-                    class="py-1.5 px-2.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all shadow-xs cursor-pointer flex items-center gap-1"
+                    class="py-1.5 px-2.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all shadow-xs cursor-pointer flex items-center gap-1 active:scale-95"
                   >
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     <span>Upload Logo</span>
@@ -530,69 +618,178 @@
                 </div>
               </div>
 
-              <div class="space-y-2.5">
-                <!-- Watermark Opacity Slider -->
-                <div class="bg-white/80 border border-amber-200/70 p-2.5 rounded-xl">
-                  <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
-                    <span class="font-bold">Watermark Opacity</span>
-                    <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ Math.round(watermark.opacity * 100) }}%</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button 
-                      type="button" 
-                      @click="watermark.opacity = Math.max(0.05, +(watermark.opacity - 0.05).toFixed(2))" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                      title="-5%"
-                    >−</button>
-                    <input 
-                      v-model.number="watermark.opacity"
-                      type="range" 
-                      min="0.05" 
-                      max="1.0" 
-                      step="0.05"
-                      class="w-full"
-                    />
-                    <button 
-                      type="button" 
-                      @click="watermark.opacity = Math.min(1.0, +(watermark.opacity + 0.05).toFixed(2))" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                      title="+5%"
-                    >+</button>
-                  </div>
-                </div>
+              <!-- Logo Size Slider -->
+              <div class="flex items-center justify-between gap-3 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Logo Size</span>
+                <input 
+                  v-model.number="logoConfig.size"
+                  type="range" 
+                  min="60" 
+                  max="400" 
+                  step="10"
+                  :title="logoConfig.size + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
+              </div>
 
-                <!-- Watermark Size Slider -->
-                <div class="bg-white/80 border border-amber-200/70 p-2.5 rounded-xl">
-                  <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1.5">
-                    <span class="font-bold">Logo Size</span>
-                    <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ watermark.size }}px</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button 
-                      type="button" 
-                      @click="watermark.size = Math.max(100, watermark.size - 10)" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                      title="-10px"
-                    >−</button>
-                    <input 
-                      v-model.number="watermark.size"
-                      type="range" 
-                      min="100" 
-                      max="700" 
-                      step="10"
-                      class="w-full"
-                    />
-                    <button 
-                      type="button" 
-                      @click="watermark.size = Math.min(700, watermark.size + 10)" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                      title="+10px"
-                    >+</button>
-                  </div>
-                </div>
+              <!-- Logo Opacity Slider -->
+              <div class="flex items-center justify-between gap-3 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Logo Opacity</span>
+                <input 
+                  v-model.number="logoConfig.opacity"
+                  type="range" 
+                  min="0.05" 
+                  max="1.0" 
+                  step="0.05"
+                  :title="Math.round(logoConfig.opacity * 100) + '%'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
+              </div>
+
+              <!-- Reset Logo Position -->
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[11px] text-slate-500">Drag directly on canvas to move logo</span>
+                <button
+                  type="button"
+                  @click="resetLogoPosition"
+                  class="text-[11px] font-bold text-amber-600 hover:text-amber-700 cursor-pointer"
+                >
+                  Reset Logo Position
+                </button>
               </div>
             </div>
           </div>
+
+
+          <!-- 5. Watermark Text Controls (Centered, Rotatable, Default ON) -->
+          <div class="border-t border-slate-100 pt-3 space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                </svg>
+                <span>Watermark</span>
+              </h3>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" v-model="watermark.enabled" class="sr-only peer" />
+                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                <span class="ml-2 text-slate-700 text-xs font-bold">{{ watermark.enabled ? 'ON' : 'OFF' }}</span>
+              </label>
+            </div>
+
+            <!-- Watermark Options Panel (Shown when ON) -->
+            <div v-if="watermark.enabled" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-3 transition-all">
+              <!-- Watermark Text Input -->
+              <div>
+                <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+                  <span>Watermark Text</span>
+                  <span class="text-[10px] text-slate-500">Center overlay</span>
+                </div>
+                <input 
+                  v-model="watermark.text"
+                  type="text" 
+                  placeholder="Enter watermark text (e.g. gyaan dose 11)"
+                  class="w-full bg-white border border-amber-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/10 rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none transition-all font-semibold"
+                />
+              </div>
+
+              <!-- Watermark Color (Separate Control) -->
+              <div class="flex items-center justify-between gap-3 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Watermark Color</span>
+                <div class="flex items-center gap-1.5">
+                  <input 
+                    v-model="watermark.color" 
+                    type="color" 
+                    class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-white" 
+                    title="Pick Custom Watermark Color"
+                  />
+                  <div class="flex items-center gap-1">
+                    <button
+                      v-for="wc in ['#000000', '#64748b', '#dc2626', '#2563eb', '#059669', '#d97706', '#ffffff']"
+                      :key="'wm-col-' + wc"
+                      type="button"
+                      @click="watermark.color = wc"
+                      class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs hover:scale-105"
+                      :class="watermark.color.toLowerCase() === wc.toLowerCase() ? 'ring-2 ring-amber-500 scale-110 shadow-xs' : 'border-slate-300'"
+                      :style="{ backgroundColor: wc }"
+                      :title="wc"
+                    ></button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rotation Angle Slider & Quick Presets -->
+              <div class="bg-white/90 border border-amber-200/70 p-2.5 rounded-xl space-y-2">
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Rotation Angle</span>
+                  <input 
+                    v-model.number="watermark.rotation"
+                    type="range" 
+                    min="-180" 
+                    max="180" 
+                    step="1"
+                    :title="watermark.rotation + '°'"
+                    class="w-full cursor-pointer accent-amber-500"
+                  />
+                </div>
+                <!-- Quick Preset Angles -->
+                <div class="grid grid-cols-5 gap-1 pt-0.5">
+                  <button
+                    v-for="ang in [-45, -30, 0, 30, 45]"
+                    :key="ang"
+                    type="button"
+                    @click="watermark.rotation = ang"
+                    class="py-1 px-1 rounded-md text-[11px] font-bold border transition-all text-center cursor-pointer"
+                    :class="watermark.rotation === ang ? 'bg-amber-500 text-white border-amber-600 shadow-2xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+                  >
+                    {{ ang }}°
+                  </button>
+                </div>
+              </div>
+
+              <!-- Watermark Font Size Slider -->
+              <div class="flex items-center justify-between gap-3 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Text Size</span>
+                <input 
+                  v-model.number="watermark.fontSize"
+                  type="range" 
+                  min="20" 
+                  max="180" 
+                  step="2"
+                  :title="watermark.fontSize + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
+              </div>
+
+              <!-- Watermark Opacity Slider -->
+              <div class="flex items-center justify-between gap-3 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Opacity</span>
+                <input 
+                  v-model.number="watermark.opacity"
+                  type="range" 
+                  min="0.04" 
+                  max="1.0" 
+                  step="0.02"
+                  :title="Math.round(watermark.opacity * 100) + '%'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
+              </div>
+
+              <!-- Reset Watermark Position / Rotation -->
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[11px] text-slate-500">Drag directly on canvas to reposition</span>
+                <button
+                  type="button"
+                  @click="resetWatermarkPosition"
+                  class="text-[11px] font-bold text-amber-600 hover:text-amber-700 cursor-pointer"
+                >
+                  Reset Position & Angle
+                </button>
+              </div>
+            </div>
+          </div>
+
+         
         </div>
 
         <!-- DESKTOP ACTION BUTTONS (Always visible at bottom of Left Panel on Desktop) -->
@@ -789,160 +986,64 @@
             </div>
           </div>
 
-          <!-- MOBILE TAB 2: SIZE (Single-slider-at-a-time selector) -->
+          <!-- MOBILE TAB 2: SIZE -->
           <div v-show="mobileTab === 'size'" class="space-y-3">
-            <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Select Size To Adjust</span>
-            </div>
-
-            <!-- 4-Pill Size Target Selector -->
-            <div class="grid grid-cols-4 gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200 text-center">
-              <button 
-                type="button" 
-                @click="activeSizeTarget = 'border'"
-                class="py-2 px-1 text-xs font-bold rounded-lg transition-all cursor-pointer"
-                :class="activeSizeTarget === 'border' ? 'bg-amber-500 text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-slate-900'"
-              >
-                Border
-              </button>
-              <button 
-                type="button" 
-                @click="activeSizeTarget = 'type'"
-                class="py-2 px-1 text-xs font-bold rounded-lg transition-all cursor-pointer"
-                :class="activeSizeTarget === 'type' ? 'bg-amber-500 text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-slate-900'"
-              >
-                Type
-              </button>
-              <button  
-                type="button" 
-                @click="activeSizeTarget = 'question'"
-                class="py-2 px-1 text-xs font-bold rounded-lg transition-all cursor-pointer"
-                :class="activeSizeTarget === 'question' ? 'bg-amber-500 text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-slate-900'"
-              >
-                Question
-              </button>
-              <button 
-                type="button" 
-                @click="activeSizeTarget = 'option'"
-                class="py-2 px-1 text-xs font-bold rounded-lg transition-all cursor-pointer"
-                :class="activeSizeTarget === 'option' ? 'bg-amber-500 text-white shadow-xs font-extrabold' : 'text-slate-600 hover:text-slate-900'"
-              >
-                Option
-              </button>
-            </div>
-
-            <!-- Only Active Size Slider Is Shown Here -->
-            <div class="bg-slate-50 border border-slate-200/90 p-3.5 rounded-xl">
+            <!-- All Sliders: Single-Line Compact Rows -->
+            <div class="space-y-2">
               <!-- Border Width Slider -->
-              <div v-show="activeSizeTarget === 'border'">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-2">
-                  <span class="font-bold">Border Width</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ style.borderWidth }}px</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="style.borderWidth = Math.max(0, style.borderWidth - 1)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >−</button>
-                  <input 
-                    v-model.number="style.borderWidth"
-                    type="range" 
-                    min="0" 
-                    max="10" 
-                    step="1"
-                    class="w-full"
-                  />
-                  <button 
-                    type="button" 
-                    @click="style.borderWidth = Math.min(10, style.borderWidth + 1)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >+</button>
-                </div>
+              <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Border Width</span>
+                <input 
+                  v-model.number="style.borderWidth"
+                  type="range" 
+                  min="0" 
+                  max="10" 
+                  step="1"
+                  :title="style.borderWidth + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
               </div>
 
               <!-- Type Font Size Slider -->
-              <div v-show="activeSizeTarget === 'type'">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-2">
-                  <span class="font-bold">Type Size</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ style.typeFontSize }}px</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="style.typeFontSize = Math.max(24, style.typeFontSize - 2)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >−</button>
-                  <input 
-                    v-model.number="style.typeFontSize"
-                    type="range" 
-                    min="24" 
-                    max="68" 
-                    step="2"
-                    class="w-full"
-                  />
-                  <button 
-                    type="button" 
-                    @click="style.typeFontSize = Math.min(68, style.typeFontSize + 2)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >+</button>
-                </div>
+              <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Type Size</span>
+                <input 
+                  v-model.number="style.typeFontSize"
+                  type="range" 
+                  min="24" 
+                  max="68" 
+                  step="2"
+                  :title="style.typeFontSize + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
               </div>
 
               <!-- Question Size Slider -->
-              <div v-show="activeSizeTarget === 'question'">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-2">
-                  <span class="font-bold">Question Size</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ style.questionFontSize }}px</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="style.questionFontSize = Math.max(28, style.questionFontSize - 2)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >−</button>
-                  <input 
-                    v-model.number="style.questionFontSize"
-                    type="range" 
-                    min="28" 
-                    max="68" 
-                    step="2"
-                    class="w-full"
-                  />
-                  <button 
-                    type="button" 
-                    @click="style.questionFontSize = Math.min(68, style.questionFontSize + 2)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >+</button>
-                </div>
+              <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Question Size</span>
+                <input 
+                  v-model.number="style.questionFontSize"
+                  type="range" 
+                  min="28" 
+                  max="68" 
+                  step="2"
+                  :title="style.questionFontSize + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
               </div>
 
-              <!-- Option Font Size Slider -->
-              <div v-show="activeSizeTarget === 'option'">
-                <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-2">
-                  <span class="font-bold">Option Size</span>
-                  <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ style.optionFontSize }}px</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button" 
-                    @click="style.optionFontSize = Math.max(20, style.optionFontSize - 2)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >−</button>
-                  <input 
-                    v-model.number="style.optionFontSize"
-                    type="range" 
-                    min="20" 
-                    max="46" 
-                    step="2"
-                    class="w-full"
-                  />
-                  <button 
-                    type="button" 
-                    @click="style.optionFontSize = Math.min(46, style.optionFontSize + 2)" 
-                    class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-lg shrink-0 active:scale-90 transition-all shadow-xs cursor-pointer select-none"
-                  >+</button>
-                </div>
+              <!-- Option Text Size Slider -->
+              <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Option Size</span>
+                <input 
+                  v-model.number="style.optionFontSize"
+                  type="range" 
+                  min="20" 
+                  max="46" 
+                  step="2"
+                  :title="style.optionFontSize + 'px'"
+                  class="w-full cursor-pointer accent-amber-500"
+                />
               </div>
             </div>
 
@@ -976,148 +1077,167 @@
               </div>
             </div>
 
-            <!-- Custom Colors (Mobile) -->
+            <!-- Color Theme (Globally Applies to Border, Type, Question, Option, Option Badge Shape) -->
+            <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-xl space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4 4 4 0 014-4h2.586a1 1 0 00.707-.293l5.414-5.414a2 2 0 012.828 0l1.414 1.414a2 2 0 010 2.828l-5.414 5.414a1 1 0 00-.293.707V17a4 4 0 01-4 4H7z" />
+                    </svg>
+                    <span>Color Theme</span>
+                  </span>
+                  <span class="text-[10px] text-slate-500 block">Border, Type, Question, Options & Badges</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <input 
+                    type="color" 
+                    :value="themeColor" 
+                    @input="applyThemeColor(($event.target as HTMLInputElement).value)" 
+                    class="w-7 h-7 rounded-lg border border-slate-300 cursor-pointer p-0.5 bg-white shadow-2xs"
+                    title="Pick Any Custom Theme Color"
+                  />
+                  <span class="font-mono text-[10px] font-bold text-slate-600 bg-white px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ themeColor }}</span>
+                </div>
+              </div>
+
+              <!-- Color Theme Presets Row -->
+              <div class="flex items-center gap-1.5 pt-1 border-t border-slate-200/70 flex-wrap">
+                <button
+                  v-for="th in [
+                    { name: 'Black', color: '#000000' },
+                    { name: 'Navy', color: '#1d4ed8' },
+                    { name: 'Red', color: '#dc2626' },
+                    { name: 'Emerald', color: '#059669' },
+                    { name: 'Amber', color: '#d97706' },
+                    { name: 'Purple', color: '#7c3aed' },
+                    { name: 'Rose', color: '#db2777' },
+                    { name: 'Teal', color: '#0f766e' },
+                    { name: 'Slate', color: '#334155' }
+                  ]"
+                  :key="'mob-th-' + th.color"
+                  type="button"
+                  @click="applyThemeColor(th.color)"
+                  class="w-6 h-6 rounded-lg border transition-all cursor-pointer shadow-2xs hover:scale-105"
+                  :class="themeColor.toLowerCase() === th.color.toLowerCase() ? 'ring-2 ring-amber-500 scale-110 shadow-xs' : 'border-slate-300'"
+                  :style="{ backgroundColor: th.color }"
+                  :title="th.name + ' (' + th.color + ')'"
+                ></button>
+              </div>
+            </div>
+
+            <!-- Background Config Card (Solid Color Default White or Custom Uploaded Image) -->
             <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-xl space-y-2.5">
-              <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Custom Colors</h4>
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Background</span>
+                  </span>
+                  <span class="text-[10px] text-slate-500 block">{{ bgConfig.type === 'image' && bgConfig.imageUrl ? 'Custom Image Active' : 'Solid Color Active' }}</span>
+                </div>
 
-              <!-- 1. Question Type Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
+                <div class="flex items-center gap-1.5">
+                  <button 
+                    type="button" 
+                    @click="bgConfig.type = 'color'" 
+                    class="px-2 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer"
+                    :class="bgConfig.type === 'color' ? 'bg-amber-500 text-white border-amber-600 shadow-2xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                  >
+                    Solid Color
+                  </button>
+                  <button 
+                    type="button" 
+                    @click="triggerBgImageUpload" 
+                    class="px-2 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer flex items-center gap-1"
+                    :class="bgConfig.type === 'image' && bgConfig.imageUrl ? 'bg-amber-500 text-white border-amber-600 shadow-2xs' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    <span>Upload Image</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Solid Color Controls (When type === 'color') -->
+              <div v-if="bgConfig.type === 'color'" class="space-y-2 pt-1 border-t border-slate-200/70">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-700">Type Heading Color</span>
+                  <span class="text-xs font-semibold text-slate-700">Solid Color:</span>
                   <div class="flex items-center gap-1.5">
                     <input 
-                      v-model="style.typeColor" 
+                      v-model="bgConfig.color" 
                       type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
+                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-white" 
+                      title="Pick Custom BG Color"
                     />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.typeColor }}</span>
+                    <span class="font-mono text-[10px] font-bold text-slate-600 bg-white px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ bgConfig.color }}</span>
+                    <button 
+                      v-if="bgConfig.color.toLowerCase() !== '#ffffff'" 
+                      type="button" 
+                      @click="resetBgToWhite" 
+                      class="text-[10px] font-bold text-amber-600 hover:text-amber-700 underline cursor-pointer ml-1"
+                    >
+                      Default White
+                    </button>
                   </div>
                 </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
+
+                <div class="flex items-center gap-1.5 flex-wrap">
                   <button
-                    v-for="c in ['#000000', '#dc2626', '#2563eb', '#059669', '#d97706', '#7c3aed', '#ffffff']"
-                    :key="'mob-type-c-' + c"
+                    v-for="bgC in [
+                      { name: 'White', color: '#ffffff' },
+                      { name: 'Off-White', color: '#f8fafc' },
+                      { name: 'Cream', color: '#fefce8' },
+                      { name: 'Soft Amber', color: '#fffbeb' },
+                      { name: 'Mint', color: '#f0fdf4' },
+                      { name: 'Sky', color: '#eff6ff' },
+                      { name: 'Rose', color: '#fdf2f8' },
+                      { name: 'Dark Slate', color: '#0f172a' }
+                    ]"
+                    :key="'mob-bg-c-' + bgC.color"
                     type="button"
-                    @click="style.typeColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.typeColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
+                    @click="bgConfig.color = bgC.color; bgConfig.type = 'color'"
+                    class="w-6 h-6 rounded-lg border transition-all cursor-pointer shadow-2xs hover:scale-105"
+                    :class="bgConfig.color.toLowerCase() === bgC.color.toLowerCase() ? 'ring-2 ring-amber-500 scale-110 shadow-xs' : 'border-slate-300'"
+                    :style="{ backgroundColor: bgC.color }"
+                    :title="bgC.name + ' (' + bgC.color + ')'"
                   ></button>
                 </div>
               </div>
 
-              <!-- 2. Question Text Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-700">Question Color</span>
-                  <div class="flex items-center gap-1.5">
-                    <input 
-                      v-model="style.questionColor" 
-                      type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.questionColor }}</span>
+              <!-- Image Mode Preview & Actions -->
+              <div v-else class="space-y-2 pt-1 border-t border-slate-200/70">
+                <div v-if="bgConfig.imageUrl" class="flex items-center justify-between gap-3 bg-white p-2 rounded-lg border border-slate-200">
+                  <div class="flex items-center gap-2 overflow-hidden">
+                    <img :src="bgConfig.imageUrl" alt="BG Preview" class="w-12 h-8 object-cover rounded border border-slate-200 shrink-0" />
+                    <span class="text-xs font-semibold text-slate-700 truncate">Background Image</span>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <button 
+                      type="button" 
+                      @click="triggerBgImageUpload" 
+                      class="text-[11px] font-bold text-amber-600 hover:text-amber-700 px-2 py-1 rounded bg-amber-50 cursor-pointer"
+                    >
+                      Change
+                    </button>
+                    <button 
+                      type="button" 
+                      @click="removeBgImage" 
+                      class="text-[11px] font-bold text-rose-600 hover:text-rose-700 px-2 py-1 rounded bg-rose-50 cursor-pointer"
+                    >
+                      Remove
+                    </button>
                   </div>
                 </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <button
-                    v-for="c in ['#000000', '#1e293b', '#dc2626', '#2563eb', '#059669', '#d97706', '#ffffff']"
-                    :key="'mob-q-c-' + c"
-                    type="button"
-                    @click="style.questionColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.questionColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
-                  ></button>
-                </div>
-              </div>
-
-              <!-- 3. Option Text Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-slate-700">Option Text Color</span>
-                  <div class="flex items-center gap-1.5">
-                    <input 
-                      v-model="style.optionColor" 
-                      type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.optionColor }}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <button
-                    v-for="c in ['#000000', '#1e293b', '#334155', '#2563eb', '#059669', '#dc2626', '#ffffff']"
-                    :key="'mob-opt-c-' + c"
-                    type="button"
-                    @click="style.optionColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.optionColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
-                  ></button>
-                </div>
-              </div>
-
-              <!-- 4. Option Shape Fill Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="block text-xs font-bold text-slate-700">Option Shape Fill</span>
-                    <span class="text-[10px] text-slate-400">Background of A, B, C, D</span>
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    <input 
-                      v-model="style.optionBadgeBgColor" 
-                      type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.optionBadgeBgColor }}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <button
-                    v-for="c in ['#1f2937', '#000000', '#2563eb', '#059669', '#dc2626', '#d97706', '#7c3aed', '#ffffff']"
-                    :key="'mob-badge-bg-c-' + c"
-                    type="button"
-                    @click="style.optionBadgeBgColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.optionBadgeBgColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
-                  ></button>
-                </div>
-              </div>
-
-              <!-- 5. Option Shape Letter Color -->
-              <div class="bg-white border border-slate-200/80 p-2.5 rounded-lg space-y-1.5">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <span class="block text-xs font-bold text-slate-700">Option Shape Letter</span>
-                    <span class="text-[10px] text-slate-400">Letter inside shape</span>
-                  </div>
-                  <div class="flex items-center gap-1.5">
-                    <input 
-                      v-model="style.optionBadgeTextColor" 
-                      type="color" 
-                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-transparent" 
-                    />
-                    <span class="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{{ style.optionBadgeTextColor }}</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 pt-1 border-t border-slate-100 flex-wrap">
-                  <span class="text-[10px] text-slate-400 font-semibold shrink-0">Presets:</span>
-                  <button
-                    v-for="c in ['#ffffff', '#000000', '#facc15', '#f87171', '#6ee7b7']"
-                    :key="'mob-badge-text-c-' + c"
-                    type="button"
-                    @click="style.optionBadgeTextColor = c"
-                    class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs"
-                    :class="style.optionBadgeTextColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 border-amber-500 scale-110' : 'border-slate-300'"
-                    :style="{ backgroundColor: c }"
-                  ></button>
+                <div v-else class="text-center py-3 bg-white rounded-lg border border-dashed border-slate-300">
+                  <button 
+                    type="button" 
+                    @click="triggerBgImageUpload" 
+                    class="text-xs font-bold text-amber-600 hover:text-amber-700 cursor-pointer"
+                  >
+                    + Upload background image from device
+                  </button>
                 </div>
               </div>
             </div>
@@ -1152,69 +1272,177 @@
               </button>
             </div>
 
-            <!-- Drag Switch & Target Selector -->
-            <div class="space-y-2 pt-1 border-t border-slate-100">
+            <!-- Drag Switch (Global - Drag Any Element) -->
+            <div class="space-y-1.5 pt-1 border-t border-slate-100">
               <div class="flex items-center justify-between text-xs font-medium text-slate-600">
-                <span class="font-bold">Drag Mode</span>
+                <span class="font-bold flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V4a1.5 1.5 0 013 0v4.5m0 0a1.5 1.5 0 013 0V9a1.5 1.5 0 013 0v3.5" />
+                  </svg>
+                  <span>Drag Mode</span>
+                </span>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" v-model="enableDrag" class="sr-only peer" />
                   <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
                   <span class="ml-2 text-slate-700 text-xs font-bold">{{ enableDrag ? 'ON' : 'OFF' }}</span>
                 </label>
               </div>
-
-              <div v-if="enableDrag" class="bg-amber-50/80 border border-amber-200 p-2.5 rounded-xl space-y-1.5">
-                <label class="block text-[11px] font-bold text-amber-900">Choose Element</label>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                  <button
-                    type="button"
-                    @click="activeDragTarget = 'type'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'type' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200'"
-                  >Type</button>
-                  <button
-                    type="button"
-                    @click="activeDragTarget = 'question'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'question' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200'"
-                  >Question</button>
-                  <button
-                    type="button"
-                    @click="activeDragTarget = 'options'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'options' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200'"
-                  >Options</button>
-                  <button
-                    type="button"
-                    @click="activeDragTarget = 'watermark'"
-                    class="px-2 py-1.5 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
-                    :class="activeDragTarget === 'watermark' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200'"
-                    :disabled="!watermark.enabled"
-                  >Watermark</button>
-                </div>
-              </div>
+              <p class="text-[11px] text-slate-500 leading-relaxed">
+                When ON, directly click & drag any element on the preview canvas without selecting anything.
+              </p>
             </div>
 
-            <!-- Watermark Controls -->
+            <!-- Watermark Text Controls (Mobile) -->
             <div class="border-t border-slate-100 pt-3 space-y-3">
               <div class="flex items-center justify-between">
-                <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Watermark</h3>
+                <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                  </svg>
+                  <span>Watermark</span>
+                </h3>
                 <label class="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" v-model="watermark.enabled" class="sr-only peer" />
                   <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-                  <span class="ml-2 text-slate-700 text-xs font-bold">{{ watermark.enabled ? 'YES' : 'NO' }}</span>
+                  <span class="ml-2 text-slate-700 text-xs font-bold">{{ watermark.enabled ? 'ON' : 'OFF' }}</span>
                 </label>
               </div>
 
               <div v-if="watermark.enabled" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5">
-                <!-- Upload / Change Watermark Logo Button -->
+                <!-- Watermark Text Input -->
+                <div>
+                  <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1">
+                    <span>Watermark Text</span>
+                  </div>
+                  <input 
+                    v-model="watermark.text"
+                    type="text" 
+                    placeholder="Enter watermark text (e.g. gyaan dose 11)"
+                    class="w-full bg-white border border-amber-200 focus:border-amber-500 rounded-xl px-3 py-2 text-sm text-slate-900 outline-none font-semibold"
+                  />
+                </div>
+
+                <!-- Watermark Color (Separate Control) -->
+                <div class="flex items-center justify-between gap-3 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
+                  <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Watermark Color</span>
+                  <div class="flex items-center gap-1.5">
+                    <input 
+                      v-model="watermark.color" 
+                      type="color" 
+                      class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-white" 
+                      title="Pick Custom Watermark Color"
+                    />
+                    <div class="flex items-center gap-1">
+                      <button
+                        v-for="wc in ['#000000', '#64748b', '#dc2626', '#2563eb', '#059669', '#d97706', '#ffffff']"
+                        :key="'mob-wm-col-' + wc"
+                        type="button"
+                        @click="watermark.color = wc"
+                        class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs hover:scale-105"
+                        :class="watermark.color.toLowerCase() === wc.toLowerCase() ? 'ring-2 ring-amber-500 scale-110 shadow-xs' : 'border-slate-300'"
+                        :style="{ backgroundColor: wc }"
+                        :title="wc"
+                      ></button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Rotation Angle Slider & Quick Presets -->
+                <div class="bg-white/90 border border-amber-200/70 p-2.5 rounded-xl space-y-2">
+                  <div class="flex items-center justify-between gap-3">
+                    <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Rotation Angle</span>
+                    <input 
+                      v-model.number="watermark.rotation"
+                      type="range" 
+                      min="-180" 
+                      max="180" 
+                      step="1"
+                      :title="watermark.rotation + '°'"
+                      class="w-full cursor-pointer accent-amber-500"
+                    />
+                  </div>
+                  <!-- Quick Preset Angles -->
+                  <div class="grid grid-cols-5 gap-1 pt-0.5">
+                    <button
+                      v-for="ang in [-45, -30, 0, 30, 45]"
+                      :key="ang"
+                      type="button"
+                      @click="watermark.rotation = ang"
+                      class="py-1 px-1 rounded-md text-[10px] font-bold border transition-all text-center"
+                      :class="watermark.rotation === ang ? 'bg-amber-500 text-white border-amber-600' : 'bg-slate-50 text-slate-600 border-slate-200'"
+                    >
+                      {{ ang }}°
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Text Size Slider -->
+                <div class="flex items-center justify-between gap-3 bg-white/80 border border-amber-200/70 px-3 py-2 rounded-xl">
+                  <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Text Size</span>
+                  <input 
+                    v-model.number="watermark.fontSize"
+                    type="range" 
+                    min="20" 
+                    max="180" 
+                    step="2"
+                    :title="watermark.fontSize + 'px'"
+                    class="w-full cursor-pointer accent-amber-500"
+                  />
+                </div>
+
+                <!-- Watermark Opacity Slider -->
+                <div class="flex items-center justify-between gap-3 bg-white/80 border border-amber-200/70 px-3 py-2 rounded-xl">
+                  <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Opacity</span>
+                  <input 
+                    v-model.number="watermark.opacity"
+                    type="range" 
+                    min="0.04" 
+                    max="1.0" 
+                    step="0.02"
+                    :title="Math.round(watermark.opacity * 100) + '%'"
+                    class="w-full cursor-pointer accent-amber-500"
+                  />
+                </div>
+
+                <!-- Reset Watermark -->
+                <div class="flex items-center justify-between pt-0.5">
+                  <span class="text-[10px] text-slate-500">Drag directly to reposition</span>
+                  <button
+                    type="button"
+                    @click="resetWatermarkPosition"
+                    class="text-[10px] font-bold text-amber-600 hover:text-amber-700"
+                  >
+                    Reset Angle & Position
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Logo Controls (Mobile) -->
+            <div class="border-t border-slate-100 pt-3 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-xs text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>Logo</span>
+                </h3>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="logoConfig.enabled" class="sr-only peer" />
+                  <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                  <span class="ml-2 text-slate-700 text-xs font-bold">{{ logoConfig.enabled ? 'ON' : 'OFF' }}</span>
+                </label>
+              </div>
+
+              <div v-if="logoConfig.enabled" class="bg-amber-50/50 border border-amber-200/80 p-3 rounded-xl space-y-2.5">
+                <!-- Upload / Change Logo Button -->
                 <div class="bg-white/90 border border-amber-200/70 p-2 rounded-xl flex items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <div class="w-9 h-9 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 p-0.5">
                       <img :src="logoConfig.customUrl || '/logo.png'" alt="Logo Preview" class="w-full h-full object-contain" />
                     </div>
                     <div>
-                      <span class="block text-xs font-bold text-slate-800">Watermark Logo</span>
+                      <span class="block text-xs font-bold text-slate-800">Channel Logo</span>
                       <span class="text-[10px] text-slate-500">{{ logoConfig.customUrl ? 'Custom' : 'Default' }}</span>
                     </div>
                   </div>
@@ -1239,60 +1467,44 @@
                   </div>
                 </div>
 
-                <!-- Watermark Opacity Slider -->
-                <div class="bg-white/80 border border-amber-200/70 p-2 rounded-xl">
-                  <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1">
-                    <span class="font-bold">Watermark Opacity</span>
-                    <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ Math.round(watermark.opacity * 100) }}%</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button 
-                      type="button" 
-                      @click="watermark.opacity = Math.max(0.05, +(watermark.opacity - 0.05).toFixed(2))" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90"
-                    >−</button>
-                    <input 
-                      v-model.number="watermark.opacity"
-                      type="range" 
-                      min="0.05" 
-                      max="1.0" 
-                      step="0.05"
-                      class="w-full"
-                    />
-                    <button 
-                      type="button" 
-                      @click="watermark.opacity = Math.min(1.0, +(watermark.opacity + 0.05).toFixed(2))" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90"
-                    >+</button>
-                  </div>
+                <!-- Logo Size Slider -->
+                <div class="flex items-center justify-between gap-3 bg-white/80 border border-amber-200/70 px-3 py-2 rounded-xl">
+                  <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Logo Size</span>
+                  <input 
+                    v-model.number="logoConfig.size"
+                    type="range" 
+                    min="60" 
+                    max="400" 
+                    step="10"
+                    :title="logoConfig.size + 'px'"
+                    class="w-full cursor-pointer accent-amber-500"
+                  />
                 </div>
 
-                <!-- Watermark Size Slider -->
-                <div class="bg-white/80 border border-amber-200/70 p-2 rounded-xl">
-                  <div class="flex justify-between items-center text-xs font-semibold text-slate-700 mb-1">
-                    <span class="font-bold">Logo Size</span>
-                    <span class="text-amber-600 font-mono font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">{{ watermark.size }}px</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button 
-                      type="button" 
-                      @click="watermark.size = Math.max(100, watermark.size - 10)" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90"
-                    >−</button>
-                    <input 
-                      v-model.number="watermark.size"
-                      type="range" 
-                      min="100" 
-                      max="700" 
-                      step="10"
-                      class="w-full"
-                    />
-                    <button 
-                      type="button" 
-                      @click="watermark.size = Math.min(700, watermark.size + 10)" 
-                      class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 font-bold text-base shrink-0 active:scale-90"
-                    >+</button>
-                  </div>
+                <!-- Logo Opacity Slider -->
+                <div class="flex items-center justify-between gap-3 bg-white/80 border border-amber-200/70 px-3 py-2 rounded-xl">
+                  <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Logo Opacity</span>
+                  <input 
+                    v-model.number="logoConfig.opacity"
+                    type="range" 
+                    min="0.05" 
+                    max="1.0" 
+                    step="0.05"
+                    :title="Math.round(logoConfig.opacity * 100) + '%'"
+                    class="w-full cursor-pointer accent-amber-500"
+                  />
+                </div>
+
+                <!-- Reset Logo Position -->
+                <div class="flex items-center justify-between pt-0.5">
+                  <span class="text-[10px] text-slate-500">Drag directly to move</span>
+                  <button
+                    type="button"
+                    @click="resetLogoPosition"
+                    class="text-[10px] font-bold text-amber-600 hover:text-amber-700"
+                  >
+                    Reset Position
+                  </button>
                 </div>
               </div>
             </div>
@@ -1337,7 +1549,7 @@
             :width="currentDimensions.w" 
             :height="currentDimensions.h"
             class="w-full h-full object-contain select-none"
-            :class="enableDrag ? 'touch-none cursor-move' : 'cursor-default'"
+            :class="enableDrag ? (isDragging ? 'touch-none cursor-grabbing' : 'touch-none cursor-grab') : 'cursor-default'"
             @mousedown="onCanvasMouseDown"
             @mousemove="onCanvasMouseMove"
             @mouseup="onCanvasMouseUp"
@@ -1347,7 +1559,7 @@
             @touchend="onTouchEnd"
             @touchcancel="onTouchEnd"
           ></canvas>
-
+ 
           <!-- Rendering video overlay -->
           <div 
             v-if="isGeneratingVideo" 
@@ -1379,7 +1591,7 @@
 
             <!-- Generate Video Button -->
             <button 
-              @click="startBulletproofVideoGeneration"
+              @click="startBulletproofVideoGeneration"  
               :disabled="isGeneratingVideo"
               type="button"
               class="w-full py-2.5 px-2 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98] border shadow-md"
@@ -1799,6 +2011,7 @@ const style = reactive({
   questionFontSize: savedStyleJson?.questionFontSize ?? 50,
   optionFontSize: savedStyleJson?.optionFontSize ?? 36,
   borderWidth: savedStyleJson?.borderWidth ?? 2,
+  borderColor: savedStyleJson?.borderColor || '#000000',
   typeColor: savedStyleJson?.typeColor || '#000000',
   questionColor: savedStyleJson?.questionColor || '#000000',
   optionColor: savedStyleJson?.optionColor || '#000000',
@@ -1818,6 +2031,7 @@ watch(
         questionFontSize: newStyle.questionFontSize,
         optionFontSize: newStyle.optionFontSize,
         borderWidth: newStyle.borderWidth,
+        borderColor: newStyle.borderColor,
         typeColor: newStyle.typeColor,
         questionColor: newStyle.questionColor,
         optionColor: newStyle.optionColor,
@@ -1829,6 +2043,17 @@ watch(
   },
   { deep: true }
 );
+
+// Global Theme Color (Applies to Border, Type, Question, Option, and Option Badge Shape)
+const themeColor = ref(savedStyleJson?.questionColor || '#000000');
+function applyThemeColor(color: string) {
+  themeColor.value = color;
+  style.borderColor = color;
+  style.typeColor = color;
+  style.questionColor = color;
+  style.optionColor = color;
+  style.optionBadgeBgColor = color;
+}
 
 // ==========================================
 // GOOGLE FONTS DEVELOPER API (Devanagari/Hindi)
@@ -2115,10 +2340,13 @@ async function deleteAssetFromStorage(key: string): Promise<void> {
   } catch (_) {}
 }
 
-// Custom Logo Model (Watermark asset)
+// Custom Logo Model (Corner / Channel Logo, default OFF)
 const logoConfig = reactive({
-  show: false, // Corner Post Logo system removed
+  enabled: false, // Default OFF as requested
   size: 160,
+  opacity: 1.0,
+  offsetX: 0,
+  offsetY: 0,
   customUrl: ''
 });
 
@@ -2164,26 +2392,141 @@ async function resetLogoToDefault() {
   img.src = '/logo.png';
 }
 
-// Background Model (Clean Solid White)
+// Background Model (Clean Solid White default, or custom solid color, or custom uploaded image)
+const savedBgJson = (() => {
+  try {
+    const raw = localStorage.getItem('quiz_bg_config');
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) {
+    return null;
+  }
+})();
+
 const bgConfig = reactive({
-  type: 'color' as 'color' | 'image',
-  color: '#ffffff',
+  type: (savedBgJson?.type as 'color' | 'image') || 'color',
+  color: savedBgJson?.color || '#ffffff',
   imageUrl: ''
 });
 
-// Watermark Logo Model
+watch(
+  bgConfig,
+  (newBg) => {
+    try {
+      localStorage.setItem('quiz_bg_config', JSON.stringify({
+        type: newBg.type,
+        color: newBg.color
+      }));
+    } catch (_) {}
+  },
+  { deep: true }
+);
+
+const bgFileInput = ref<HTMLInputElement | null>(null);
+let bgImg: HTMLImageElement | null = null;
+
+function triggerBgImageUpload() {
+  if (bgFileInput.value) {
+    bgFileInput.value.click();
+  } else {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => onBgFileChange(e);
+    input.click();
+  }
+}
+
+async function onBgFileChange(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (event) => {
+    const result = event.target?.result as string;
+    if (!result) return;
+
+    await saveAssetToStorage('custom_bg', result);
+    bgConfig.imageUrl = result;
+    bgConfig.type = 'image';
+
+    const img = new Image();
+    img.onload = () => {
+      bgImg = img;
+      renderCanvas(-1, 4, 0.0, false, false, 1.0);
+    };
+    img.src = result;
+  };
+  reader.readAsDataURL(file);
+  target.value = '';
+}
+
+async function removeBgImage() {
+  await deleteAssetFromStorage('custom_bg');
+  bgConfig.imageUrl = '';
+  bgConfig.type = 'color';
+  bgImg = null;
+  renderCanvas(-1, 4, 0.0, false, false, 1.0);
+}
+
+async function resetBgToWhite() {
+  await deleteAssetFromStorage('custom_bg');
+  bgConfig.color = '#ffffff';
+  bgConfig.type = 'color';
+  bgConfig.imageUrl = '';
+  bgImg = null;
+  renderCanvas(-1, 4, 0.0, false, false, 1.0);
+}
+
+// Watermark Text Model (Centered, Rotatable, default ON, default: 'gyaan dose 11')
+const savedWatermarkJson = (() => {
+  try {
+    const raw = localStorage.getItem('quiz_watermark_config');
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) {
+    return null;
+  }
+})();
+
 const watermark = reactive({
-  enabled: true,
-  opacity: 0.15,
-  size: 340,
-  offsetX: 0,
-  offsetY: 0,
-  transparentOptions: true
+  enabled: savedWatermarkJson?.enabled ?? true,
+  text: savedWatermarkJson?.text ?? 'gyaan dose 11',
+  fontSize: savedWatermarkJson?.fontSize ?? 72,
+  opacity: savedWatermarkJson?.opacity ?? 0.16,
+  rotation: savedWatermarkJson?.rotation ?? -30,
+  color: savedWatermarkJson?.color || '#000000',
+  offsetX: savedWatermarkJson?.offsetX ?? 0,
+  offsetY: savedWatermarkJson?.offsetY ?? 0
 });
+
+watch(
+  watermark,
+  (newWm) => {
+    try {
+      localStorage.setItem('quiz_watermark_config', JSON.stringify({
+        enabled: newWm.enabled,
+        text: newWm.text,
+        fontSize: newWm.fontSize,
+        opacity: newWm.opacity,
+        rotation: newWm.rotation,
+        color: newWm.color,
+        offsetX: newWm.offsetX,
+        offsetY: newWm.offsetY
+      }));
+    } catch (_) {}
+  },
+  { deep: true }
+);
 
 function resetWatermarkPosition() {
   watermark.offsetX = 0;
   watermark.offsetY = 0;
+  watermark.rotation = -30;
+}
+
+function resetLogoPosition() {
+  logoConfig.offsetX = 0;
+  logoConfig.offsetY = 0;
 }
 
 // Positioning offsets (completely independent dragging everywhere without bounds)
@@ -2199,7 +2542,7 @@ const offsets = reactive({
 });
 
 const enableDrag = ref(false);
-type DragTarget = 'type' | 'question' | 'options' | 'watermark';
+type DragTarget = 'type' | 'question' | 'options' | 'watermark' | 'logo';
 const activeDragTarget = ref<DragTarget>('type');
 const isDragging = ref(false);
 let dragStartX = 0;
@@ -2235,6 +2578,8 @@ function waitForImg(img: HTMLImageElement | null): Promise<void> {
 onMounted(async () => {
   // Listen for window scroll to synchronize preview with questions
   window.addEventListener('scroll', onWindowScroll, { passive: true });
+  window.addEventListener('mousemove', onWindowMouseMove);
+  window.addEventListener('mouseup', onWindowMouseUp);
 
   // 0. Render canvas IMMEDIATELY on first frame so it is NEVER blank on page load or reload
   await nextTick();
@@ -2251,9 +2596,19 @@ onMounted(async () => {
     logoImg.src = '/logo.png';
   }
 
-  // Safely wait for logo & fonts without blocking or hanging
+  // 1.5 Restore Custom Background if previously saved in IndexedDB
+  const savedBg = await getAssetFromStorage('custom_bg');
+  if (savedBg) {
+    bgConfig.imageUrl = savedBg;
+    bgConfig.type = 'image';
+    bgImg = new Image();
+    bgImg.src = savedBg;
+  }
+
+  // Safely wait for logo, background & fonts without blocking or hanging
   await Promise.allSettled([
     waitForImg(logoImg),
+    waitForImg(bgImg),
     Promise.race([
       document.fonts?.ready ?? Promise.resolve(),
       new Promise((resolve) => setTimeout(resolve, 1000))
@@ -2266,6 +2621,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', onWindowScroll);
+  window.removeEventListener('mousemove', onWindowMouseMove);
+  window.removeEventListener('mouseup', onWindowMouseUp);
 });
 
 // Watch inputs to re-render in real-time
@@ -2296,12 +2653,15 @@ function resetToExactSample() {
   style.questionFontSize = 50;
   style.optionFontSize = 36;
   style.borderWidth = 4;
+  style.borderColor = '#000000';
   style.typeColor = '#000000';
   style.questionColor = '#000000';
   style.optionColor = '#000000';
   style.optionBadgeBgColor = '#1f2937';
   style.optionBadgeTextColor = '#ffffff';
   style.optionShape = 'circle';
+  themeColor.value = '#000000';
+  resetBgToWhite();
   resetPositions();
 }
 
@@ -2316,6 +2676,9 @@ function resetPositions() {
   offsets.logoY = 0;
   watermark.offsetX = 0;
   watermark.offsetY = 0;
+  watermark.rotation = -30;
+  logoConfig.offsetX = 0;
+  logoConfig.offsetY = 0;
 }
 
 // ----------------- GOOGLE TTS AUDIO GENERATOR -----------------
@@ -2570,42 +2933,101 @@ function renderCanvasToCtx(
   const H = targetCanvas.height;
   const curQuiz = targetQuiz || quizList[activeQuestionIndex.value] || quizList[0];
 
-  // 1. Canvas Background (Clean White)
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, W, H);
-
-  // 2. Outer Black Frame Border (Drawn only if borderWidth > 0)
-  const bw = Math.max(0, style.borderWidth);
-  if (bw > 0) {
-    ctx.lineWidth = bw;
-    ctx.strokeStyle = '#000000';
-    ctx.strokeRect(bw / 2, bw / 2, W - bw, H - bw);
-  }
-
-  // 2.5 Optional Center Watermark Logo (Active ONLY when YES/enabled, aspect-ratio preserved)
-  if (watermark.enabled && logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
-    ctx.save();
-    ctx.globalAlpha = Math.max(0.01, Math.min(1.0, watermark.opacity));
-    const maxDim = watermark.size;
-    const aspect = logoImg.naturalWidth / logoImg.naturalHeight;
-    let wmW = maxDim;
-    let wmH = maxDim;
-    if (aspect > 1) {
-      wmW = maxDim;
-      wmH = maxDim / aspect;
-    } else {
-      wmH = maxDim;
-      wmW = maxDim * aspect;
-    }
-    const wmX = (W - wmW) / 2 + watermark.offsetX;
-    const wmY = (H - wmH) / 2 + watermark.offsetY;
-    ctx.drawImage(logoImg, wmX, wmY, wmW, wmH);
-    ctx.restore();
-  }
-
   // Scale references based on height & width
   const isReel = selectedRatio.value === '9:16';
   const isLandscape = selectedRatio.value === '16:9';
+
+  // 1. Canvas Background (Solid Color default White, or custom uploaded image)
+  if (bgConfig.type === 'image' && bgConfig.imageUrl) {
+    if (!bgImg || bgImg.src !== bgConfig.imageUrl) {
+      bgImg = new Image();
+      bgImg.onload = () => {
+        renderCanvas(-1, 4, 0.0, false, false, 1.0);
+      };
+      bgImg.src = bgConfig.imageUrl;
+    }
+    if (bgImg.complete && bgImg.naturalWidth > 0) {
+      // Draw background image covering entire canvas without distortion
+      const canvasAspect = W / H;
+      const imgAspect = bgImg.naturalWidth / bgImg.naturalHeight;
+      let sWidth = bgImg.naturalWidth;
+      let sHeight = bgImg.naturalHeight;
+      let sx = 0;
+      let sy = 0;
+      if (imgAspect > canvasAspect) {
+        sWidth = bgImg.naturalHeight * canvasAspect;
+        sx = (bgImg.naturalWidth - sWidth) / 2;
+      } else {
+        sHeight = bgImg.naturalWidth / canvasAspect;
+        sy = (bgImg.naturalHeight - sHeight) / 2;
+      }
+      ctx.drawImage(bgImg, sx, sy, sWidth, sHeight, 0, 0, W, H);
+    } else {
+      ctx.fillStyle = bgConfig.color || '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+    }
+  } else {
+    ctx.fillStyle = bgConfig.color || '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // 2. Outer Frame Border (Drawn with style.borderColor if borderWidth > 0)
+  const bw = Math.max(0, style.borderWidth);
+  if (bw > 0) {
+    ctx.lineWidth = bw;
+    ctx.strokeStyle = style.borderColor || '#000000';
+    ctx.strokeRect(bw / 2, bw / 2, W - bw, H - bw);
+  }
+
+  // 2.3 Watermark Text (Centered by default, Rotatable, Subtle Opacity)
+  if (watermark.enabled && watermark.text && watermark.text.trim()) {
+    ctx.save();
+    const wmCenterX = W / 2 + watermark.offsetX;
+    const wmCenterY = H / 2 + watermark.offsetY;
+
+    ctx.translate(wmCenterX, wmCenterY);
+    ctx.rotate((watermark.rotation * Math.PI) / 180);
+    ctx.globalAlpha = Math.max(0.01, Math.min(1.0, watermark.opacity));
+    ctx.fillStyle = watermark.color || '#000000';
+    ctx.font = `800 ${watermark.fontSize}px ${style.fontFamily}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(watermark.text.trim(), 0, 0);
+    ctx.restore();
+  }
+
+  // 2.5 Optional Channel Logo (Active when enabled, default OFF, draggable anywhere)
+  if (logoConfig.enabled) {
+    if (!logoImg) {
+      logoImg = new Image();
+      logoImg.onload = () => {
+        renderCanvas(-1, 4, 0.0, false, false, 1.0);
+      };
+      logoImg.src = logoConfig.customUrl || '/logo.png';
+    }
+    if (logoImg.complete && logoImg.naturalWidth > 0) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0.01, Math.min(1.0, logoConfig.opacity));
+      const maxDim = logoConfig.size || 160;
+      const aspect = logoImg.naturalWidth / logoImg.naturalHeight;
+      let lW = maxDim;
+      let lH = maxDim;
+      if (aspect > 1) {
+        lW = maxDim;
+        lH = maxDim / aspect;
+      } else {
+        lH = maxDim;
+        lW = maxDim * aspect;
+      }
+      // Default top-right position
+      const defLogoX = W - lW - 64;
+      const defLogoY = isReel ? 110 : isLandscape ? 35 : 45;
+      const logoX = defLogoX + logoConfig.offsetX;
+      const logoY = defLogoY + logoConfig.offsetY;
+      ctx.drawImage(logoImg, logoX, logoY, lW, lH);
+      ctx.restore();
+    }
+  }
 
   // 3. Top-Left Category (Type Heading) - Independent Dragging Anywhere!
   const categoryText = (curQuiz.category || 'सामान्य विज्ञान').trim();
@@ -2780,16 +3202,232 @@ function renderCanvas(
   );
 }
 
-// ----------------- TARGETED DRAG AND DROP (PC MOUSE + MOBILE TOUCH) -----------------
+// ----------------- TARGETED DRAG AND DROP (GLOBAL - ANY ELEMENT DIRECTLY) -----------------
 function getCanvasCoords(clientX: number, clientY: number): { x: number; y: number } | null {
   const canvas = previewCanvas.value;
   if (!canvas) return null;
   const rect = canvas.getBoundingClientRect();
-  const scale = currentDimensions.value.w / rect.width;
+  if (rect.width <= 0 || rect.height <= 0) return null;
+  const scaleX = currentDimensions.value.w / rect.width;
+  const scaleY = currentDimensions.value.h / rect.height;
   return {
-    x: (clientX - rect.left) * scale,
-    y: (clientY - rect.top) * scale
+    x: (clientX - rect.left) * scaleX,
+    y: (clientY - rect.top) * scaleY
   };
+}
+
+/**
+ * Computes bounding boxes for all active draggable elements on canvas.
+ */
+function getElementBoxes(coords?: { x: number; y: number }) {
+  const canvas = previewCanvas.value;
+  const W = currentDimensions.value.w;
+  const H = currentDimensions.value.h;
+  const isReel = selectedRatio.value === '9:16';
+  const isLandscape = selectedRatio.value === '16:9';
+  const curQuiz = quizList[activeQuestionIndex.value] || quizList[0] || { category: '', question: '', options: [] };
+  const ctx = canvas?.getContext('2d');
+
+  // 1. Type / Category Heading Box
+  const categoryText = (curQuiz.category || 'सामान्य विज्ञान').trim();
+  const typeBaseX = 64 + offsets.typeX;
+  const typeBaseY = (isReel ? 120 : isLandscape ? 40 : 55) + offsets.typeY;
+  let typeW = 350;
+  if (ctx) {
+    ctx.save();
+    ctx.font = `700 ${style.typeFontSize}px ${style.fontFamily}`;
+    typeW = Math.max(120, ctx.measureText(categoryText).width);
+    ctx.restore();
+  }
+  const typeH = style.typeFontSize * 1.4;
+  const typeBox = {
+    target: 'type' as DragTarget,
+    left: typeBaseX - 35,
+    top: typeBaseY - 25,
+    right: typeBaseX + typeW + 35,
+    bottom: typeBaseY + typeH + 25,
+    centerX: typeBaseX + typeW / 2,
+    centerY: typeBaseY + typeH / 2
+  };
+
+  // 2. Question Text Box
+  const questionBaseX = W / 2 + offsets.questionX;
+  const questionBaseY = (isReel ? 420 : isLandscape ? 180 : 220) + offsets.questionY;
+  const questionMaxW = isLandscape ? 1600 : 920;
+  let totalQuestionHeight = style.questionFontSize * 2;
+  let maxLineWidth = questionMaxW;
+  if (ctx) {
+    ctx.save();
+    ctx.font = `700 ${style.questionFontSize}px ${style.fontFamily}`;
+    const qLines = wrapText(ctx, curQuiz.question || 'प्रश्न यहाँ दिखाई देगा...', questionMaxW);
+    const qLineHeight = style.questionFontSize * 1.32;
+    totalQuestionHeight = Math.max(qLineHeight, qLines.length * qLineHeight);
+    let measuredMax = 0;
+    for (const l of qLines) {
+      const mw = ctx.measureText(l).width;
+      if (mw > measuredMax) measuredMax = mw;
+    }
+    maxLineWidth = Math.min(questionMaxW, Math.max(300, measuredMax + 80));
+    ctx.restore();
+  }
+  const questionBox = {
+    target: 'question' as DragTarget,
+    left: questionBaseX - (maxLineWidth / 2) - 35,
+    top: questionBaseY - 30,
+    right: questionBaseX + (maxLineWidth / 2) + 35,
+    bottom: questionBaseY + totalQuestionHeight + 35,
+    centerX: questionBaseX,
+    centerY: questionBaseY + totalQuestionHeight / 2
+  };
+
+  // 3. Options Block Box (All 4 Options)
+  const optW = isLandscape ? 1400 : 910;
+  const optX = (W - optW) / 2 + offsets.optionsX;
+  const optGap = isReel ? 28 : isLandscape ? 16 : 16;
+  const optionsStartY = (isReel ? 780 : isLandscape ? 400 : 430) + offsets.optionsY;
+  let totalOptionsH = (isReel ? 84 : 72) * 4 + optGap * 3;
+  if (ctx) {
+    ctx.save();
+    ctx.font = `700 ${style.optionFontSize}px ${style.fontFamily}`;
+    const shapeSize = isReel ? 68 : isLandscape ? 58 : 64;
+    const maxTextAvailableWidth = optW - (14 + shapeSize + 40);
+    let curY = optionsStartY;
+    for (let i = 0; i < 4; i++) {
+      const optText = curQuiz.options?.[i] || `Option ${['A','B','C','D'][i]}`;
+      const optLines = wrapText(ctx, optText, maxTextAvailableWidth);
+      const lineH = style.optionFontSize * 1.25;
+      const contentH = optLines.length * lineH;
+      const optH = Math.max(isReel ? 84 : 72, contentH + 24);
+      curY += optH + optGap;
+    }
+    totalOptionsH = curY - optionsStartY;
+    ctx.restore();
+  }
+  const optionsBox = {
+    target: 'options' as DragTarget,
+    left: optX - 35,
+    top: optionsStartY - 30,
+    right: optX + optW + 35,
+    bottom: optionsStartY + totalOptionsH + 30,
+    centerX: optX + optW / 2,
+    centerY: optionsStartY + totalOptionsH / 2
+  };
+
+  // 4. Watermark Text Box (Rotatable, centered by default)
+  let wmBox: { target: DragTarget; left: number; top: number; right: number; bottom: number; centerX: number; centerY: number } | null = null;
+  let isInsideWatermark = false;
+
+  if (watermark.enabled && watermark.text && watermark.text.trim()) {
+    const wmCenterX = W / 2 + watermark.offsetX;
+    const wmCenterY = H / 2 + watermark.offsetY;
+    let textW = 400;
+    if (ctx) {
+      ctx.save();
+      ctx.font = `800 ${watermark.fontSize}px ${style.fontFamily}`;
+      textW = Math.max(100, ctx.measureText(watermark.text.trim()).width);
+      ctx.restore();
+    }
+    const textH = watermark.fontSize * 1.3;
+    const radBbox = Math.hypot(textW / 2, textH / 2) + 20;
+
+    wmBox = {
+      target: 'watermark' as DragTarget,
+      left: wmCenterX - radBbox,
+      top: wmCenterY - radBbox,
+      right: wmCenterX + radBbox,
+      bottom: wmCenterY + radBbox,
+      centerX: wmCenterX,
+      centerY: wmCenterY
+    };
+
+    if (coords) {
+      // Rotated hit detection in local watermark space
+      const rotRad = (-watermark.rotation * Math.PI) / 180;
+      const cos = Math.cos(rotRad);
+      const sin = Math.sin(rotRad);
+      const dx = coords.x - wmCenterX;
+      const dy = coords.y - wmCenterY;
+      const localX = dx * cos - dy * sin;
+      const localY = dx * sin + dy * cos;
+      isInsideWatermark = Math.abs(localX) <= (textW / 2 + 35) && Math.abs(localY) <= (textH / 2 + 25);
+    }
+  }
+
+  // 5. Channel Logo Box (if active)
+  let logoBox: { target: DragTarget; left: number; top: number; right: number; bottom: number; centerX: number; centerY: number } | null = null;
+  if (logoConfig.enabled && logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
+    const maxDim = logoConfig.size || 160;
+    const aspect = logoImg.naturalWidth / logoImg.naturalHeight;
+    let lW = maxDim;
+    let lH = maxDim;
+    if (aspect > 1) {
+      lW = maxDim;
+      lH = maxDim / aspect;
+    } else {
+      lH = maxDim;
+      lW = maxDim * aspect;
+    }
+    const defLogoX = W - lW - 64;
+    const defLogoY = isReel ? 110 : isLandscape ? 35 : 45;
+    const finalLogoX = defLogoX + logoConfig.offsetX;
+    const finalLogoY = defLogoY + logoConfig.offsetY;
+    logoBox = {
+      target: 'logo' as DragTarget,
+      left: finalLogoX - 25,
+      top: finalLogoY - 25,
+      right: finalLogoX + lW + 25,
+      bottom: finalLogoY + lH + 25,
+      centerX: finalLogoX + lW / 2,
+      centerY: finalLogoY + lH / 2
+    };
+  }
+
+  return { typeBox, questionBox, optionsBox, wmBox, logoBox, isInsideWatermark };
+}
+
+/**
+ * Automatically detects which element the user clicked or touched on the canvas.
+ * Falls back to the closest element so dragging is effortless anywhere.
+ */
+function detectDragTarget(coords: { x: number; y: number }): DragTarget {
+  const { typeBox, questionBox, optionsBox, wmBox, logoBox, isInsideWatermark } = getElementBoxes(coords);
+
+  // 1. Direct hit tests (priority: type, logo, options, question, watermark)
+  if (coords.x >= typeBox.left && coords.x <= typeBox.right && coords.y >= typeBox.top && coords.y <= typeBox.bottom) {
+    return 'type';
+  }
+  if (logoBox && coords.x >= logoBox.left && coords.x <= logoBox.right && coords.y >= logoBox.top && coords.y <= logoBox.bottom) {
+    return 'logo';
+  }
+  if (coords.x >= optionsBox.left && coords.x <= optionsBox.right && coords.y >= optionsBox.top && coords.y <= optionsBox.bottom) {
+    return 'options';
+  }
+  if (coords.x >= questionBox.left && coords.x <= questionBox.right && coords.y >= questionBox.top && coords.y <= questionBox.bottom) {
+    return 'question';
+  }
+  if (wmBox && isInsideWatermark) {
+    return 'watermark';
+  }
+
+  // 2. Nearest element fallback
+  const candidates: Array<{ target: DragTarget; left: number; top: number; right: number; bottom: number; centerX: number; centerY: number }> = [typeBox, questionBox, optionsBox];
+  if (logoBox) candidates.push(logoBox);
+  if (wmBox) candidates.push(wmBox);
+
+  let closestTarget: DragTarget = 'question';
+  let minDistance = Infinity;
+
+  for (const b of candidates) {
+    const clampedX = Math.max(b.left, Math.min(coords.x, b.right));
+    const clampedY = Math.max(b.top, Math.min(coords.y, b.bottom));
+    const dist = Math.hypot(coords.x - clampedX, coords.y - clampedY);
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestTarget = b.target;
+    }
+  }
+
+  return closestTarget;
 }
 
 function startDragging(clientX: number, clientY: number) {
@@ -2797,23 +3435,30 @@ function startDragging(clientX: number, clientY: number) {
   const coords = getCanvasCoords(clientX, clientY);
   if (!coords) return;
 
+  // Automatically detect the clicked element! No manual pill/option selection needed!
+  const target = detectDragTarget(coords);
+  activeDragTarget.value = target;
+
   isDragging.value = true;
   dragStartX = coords.x;
   dragStartY = coords.y;
 
-  // Lock initial coordinates of the chosen target
-  if (activeDragTarget.value === 'type') {
+  // Lock initial coordinates of the automatically chosen target
+  if (target === 'type') {
     initialTargetX = offsets.typeX;
     initialTargetY = offsets.typeY;
-  } else if (activeDragTarget.value === 'question') {
+  } else if (target === 'question') {
     initialTargetX = offsets.questionX;
     initialTargetY = offsets.questionY;
-  } else if (activeDragTarget.value === 'options') {
+  } else if (target === 'options') {
     initialTargetX = offsets.optionsX;
     initialTargetY = offsets.optionsY;
-  } else if (activeDragTarget.value === 'watermark') {
+  } else if (target === 'watermark') {
     initialTargetX = watermark.offsetX;
     initialTargetY = watermark.offsetY;
+  } else if (target === 'logo') {
+    initialTargetX = logoConfig.offsetX;
+    initialTargetY = logoConfig.offsetY;
   }
 }
 
@@ -2825,7 +3470,7 @@ function moveDragging(clientX: number, clientY: number) {
   const deltaX = coords.x - dragStartX;
   const deltaY = coords.y - dragStartY;
 
-  // ONLY move the explicitly selected element! All others remain completely untouched.
+  // Move the automatically selected element smoothly in real time
   if (activeDragTarget.value === 'type') {
     offsets.typeX = initialTargetX + deltaX;
     offsets.typeY = initialTargetY + deltaY;
@@ -2838,7 +3483,13 @@ function moveDragging(clientX: number, clientY: number) {
   } else if (activeDragTarget.value === 'watermark') {
     watermark.offsetX = initialTargetX + deltaX;
     watermark.offsetY = initialTargetY + deltaY;
+  } else if (activeDragTarget.value === 'logo') {
+    logoConfig.offsetX = initialTargetX + deltaX;
+    logoConfig.offsetY = initialTargetY + deltaY;
   }
+
+  // Instant real-time redraw during dragging
+  renderCanvas(-1, 4, 0.0, false, false, 1.0);
 }
 
 function stopDragging() {
@@ -2851,11 +3502,25 @@ function onCanvasMouseDown(e: MouseEvent) {
 }
 
 function onCanvasMouseMove(e: MouseEvent) {
-  moveDragging(e.clientX, e.clientY);
+  if (isDragging.value) {
+    moveDragging(e.clientX, e.clientY);
+  }
 }
 
 function onCanvasMouseUp() {
   stopDragging();
+}
+
+function onWindowMouseMove(e: MouseEvent) {
+  if (isDragging.value) {
+    moveDragging(e.clientX, e.clientY);
+  }
+}
+
+function onWindowMouseUp() {
+  if (isDragging.value) {
+    stopDragging();
+  }
 }
 
 // Touch Event Handlers for Mobile Phones & Tablets
