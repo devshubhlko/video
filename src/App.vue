@@ -41,10 +41,10 @@
     <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 p-3 sm:p-6 pb-20 lg:pb-6 max-w-[1700px] w-full mx-auto items-start lg:items-stretch">
       
       <!-- LEFT PANEL: Controls & Form (5 Cols) -->
-      <section class="order-2 lg:order-1 lg:col-span-5 flex flex-col gap-4 bg-white border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-sm h-fit">
+      <section id="controls-panel" class="order-2 lg:order-1 lg:col-span-5 flex flex-col gap-4 bg-white border border-slate-200/90 p-4 sm:p-5 rounded-2xl shadow-sm h-fit">
 
-        <!-- TOP TABS: Question vs Settings -->
-        <div class="grid grid-cols-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+        <!-- TOP TABS: Question vs Settings (Desktop Only) -->
+        <div class="hidden lg:grid grid-cols-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
           <button 
             type="button"
             @click="activeTab = 'question'"
@@ -69,7 +69,7 @@
         </div>
 
         <!-- TAB 1: QUESTION CONTENT (Ratio, Type, Question, Options) -->
-        <div v-show="activeTab === 'question'" class="space-y-4">
+        <div v-show="isDesktop ? activeTab === 'question' : mobileTab === 'qa'" class="space-y-4">
           <!-- 0. Video / Image Aspect Ratio Selection -->
           <div class="bg-amber-50/70 border border-amber-200/80 p-3 rounded-xl space-y-1.5">
             <div class="grid grid-cols-3 gap-2">
@@ -264,8 +264,170 @@
           </div>
         </div>
 
-        <!-- DESKTOP TAB 2: SETTINGS (Fonts, Border, Font Sizes, Drag Mode, Watermark) -->
-        <div v-show="activeTab === 'settings'" class="hidden lg:block space-y-4">
+        <!-- MOBILE TAB 2: SIZE & LAYOUT ADJUSTMENTS (Mobile Only) -->
+        <div v-show="!isDesktop && mobileTab === 'size'" class="space-y-4">
+          <!-- Aspect Ratio Quick Switcher -->
+          <div class="bg-amber-50/70 border border-amber-200/80 p-3 rounded-xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-950 uppercase tracking-wider">Aspect Ratio</span>
+              <span class="text-[11px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">{{ selectedRatio }}</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <button 
+                @click="changeAspectRatio('1:1')"
+                class="py-2 px-2 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
+                :class="selectedRatio === '1:1' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'"
+              >
+                <div>1080 × 1080</div>
+                <div class="text-[10px] font-normal opacity-90">Square</div>
+              </button>
+              <button 
+                @click="changeAspectRatio('9:16')"
+                class="py-2 px-2 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
+                :class="selectedRatio === '9:16' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'"
+              >
+                <div>1080 × 1920</div>
+                <div class="text-[10px] font-normal opacity-90">Reels</div>
+              </button>
+              <button 
+                @click="changeAspectRatio('16:9')"
+                class="py-2 px-2 rounded-lg text-xs font-bold border transition-all text-center cursor-pointer"
+                :class="selectedRatio === '16:9' ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'"
+              >
+                <div>1920 × 1080</div>
+                <div class="text-[10px] font-normal opacity-90">YouTube</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- All Sliders: Single-Line Compact Rows -->
+          <div class="bg-white border border-slate-200/90 p-3.5 rounded-xl space-y-3 shadow-2xs">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <span class="text-xs font-bold text-slate-800">Element Sizes & Borders</span>
+              <button 
+                type="button" 
+                @click="resetPositions" 
+                class="text-[11px] font-semibold text-amber-600 hover:text-amber-700 cursor-pointer"
+              >
+                Reset Positions
+              </button>
+            </div>
+
+            <!-- Border Width Slider -->
+            <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+              <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Border Width</span>
+              <input 
+                v-model.number="style.borderWidth"
+                type="range" 
+                min="0" 
+                max="10" 
+                step="1"
+                :title="style.borderWidth + 'px'"
+                class="w-full cursor-pointer accent-amber-500"
+              />
+              <span class="text-[11px] font-mono text-slate-500 w-8 text-right font-bold">{{ style.borderWidth }}px</span>
+            </div>
+
+            <!-- Type Font Size Slider -->
+            <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+              <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Type Size</span>
+              <input 
+                v-model.number="style.typeFontSize"
+                type="range" 
+                min="24" 
+                max="68" 
+                step="2"
+                :title="style.typeFontSize + 'px'"
+                class="w-full cursor-pointer accent-amber-500"
+              />
+              <span class="text-[11px] font-mono text-slate-500 w-8 text-right font-bold">{{ style.typeFontSize }}px</span>
+            </div>
+
+            <!-- Question Size Slider -->
+            <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+              <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Question Size</span>
+              <input 
+                v-model.number="style.questionFontSize"
+                type="range" 
+                min="28" 
+                max="68" 
+                step="2"
+                :title="style.questionFontSize + 'px'"
+                class="w-full cursor-pointer accent-amber-500"
+              />
+              <span class="text-[11px] font-mono text-slate-500 w-8 text-right font-bold">{{ style.questionFontSize }}px</span>
+            </div>
+
+            <!-- Option Text Size Slider -->
+            <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+              <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Option Size</span>
+              <input 
+                v-model.number="style.optionFontSize"
+                type="range" 
+                min="20" 
+                max="46" 
+                step="2"
+                :title="style.optionFontSize + 'px'"
+                class="w-full cursor-pointer accent-amber-500"
+              />
+              <span class="text-[11px] font-mono text-slate-500 w-8 text-right font-bold">{{ style.optionFontSize }}px</span>
+            </div>
+          </div>
+
+          <!-- Option Badge Shape -->
+          <div class="bg-slate-50 border border-slate-200/80 p-3 rounded-xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700">Option Badge Shape</span>
+              <span class="text-[10px] font-mono text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 capitalize font-bold">
+                {{ style.optionShape }}
+              </span>
+            </div>
+            <div class="grid grid-cols-5 gap-1.5 pt-1">
+              <button
+                v-for="shp in ['circle', 'square', 'rounded', 'diamond', 'hexagon']"
+                :key="'mob-shape-' + shp"
+                type="button"
+                @click="style.optionShape = (shp as any)"
+                class="py-1.5 px-1 rounded-lg text-[11px] font-bold border transition-all cursor-pointer capitalize text-center"
+                :class="style.optionShape === shp ? 'bg-amber-500 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'"
+              >
+                {{ shp === 'circle' ? 'Circle' : shp === 'square' ? 'Square' : shp === 'rounded' ? 'Rounded' : shp === 'diamond' ? 'Diamond' : 'Hexagon' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Timer & Logo Sizes -->
+          <div v-if="timerConfig.enabled || logoConfig.enabled" class="bg-white border border-slate-200/90 p-3.5 rounded-xl space-y-3 shadow-2xs">
+            <span class="text-xs font-bold text-slate-800">Widget Sizes</span>
+            <div v-if="timerConfig.enabled" class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+              <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Timer Scale</span>
+              <input 
+                v-model.number="timerConfig.sizeMultiplier"
+                type="range" 
+                min="0.6" 
+                max="2.5" 
+                step="0.05"
+                class="w-full cursor-pointer accent-amber-500"
+              />
+              <span class="text-[11px] font-mono text-slate-500 w-8 text-right font-bold">{{ timerConfig.sizeMultiplier }}x</span>
+            </div>
+            <div v-if="logoConfig.enabled" class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200/80 px-3 py-2 rounded-xl">
+              <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Logo Size</span>
+              <input 
+                v-model.number="logoConfig.size"
+                type="range" 
+                min="30" 
+                max="200" 
+                step="5"
+                class="w-full cursor-pointer accent-amber-500"
+              />
+              <span class="text-[11px] font-mono text-slate-500 w-8 text-right font-bold">{{ logoConfig.size }}px</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2 / SETTINGS: (Fonts, Color Theme, Background, Sliders, Badges, Animations, TTS, Timer, Logo) -->
+        <div v-show="isDesktop ? activeTab === 'settings' : mobileTab === 'settings'" class="space-y-4">
           <!-- 4. Typography & Layout Adjustments (With Type Font Size Slider) -->
           <div class="space-y-3">
             <!-- Google Hindi Font Selector Card -->
@@ -562,22 +724,22 @@
               <span class="text-xs font-bold text-slate-700 block">Options Color Styling</span>
               
               <!-- 1. Option Text Color -->
-              <div class="flex items-center justify-between gap-2 bg-white border border-slate-200/80 px-2.5 py-1.5 rounded-lg">
-                <span class="text-[11px] font-semibold text-slate-700">Option Text Color</span>
-                <div class="flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200/80 px-2.5 py-1.5 rounded-lg">
+                <span class="text-[11px] font-semibold text-slate-700 shrink-0">Option Text Color</span>
+                <div class="flex items-center gap-1.5 flex-wrap">
                   <input 
                     v-model="style.optionColor" 
                     type="color" 
-                    class="w-5 h-5 rounded border border-slate-300 cursor-pointer p-0 bg-white" 
+                    class="w-5 h-5 shrink-0 rounded border border-slate-300 cursor-pointer p-0 bg-white" 
                     title="Pick Custom Option Text Color"
                   />
-                  <div class="flex items-center gap-1">
+                  <div class="flex items-center gap-1 flex-wrap">
                     <button
                       v-for="c in ['#000000', '#1e293b', '#dc2626', '#2563eb', '#16a34a', '#d97706', '#ffffff']"
                       :key="'desk-opt-c-' + c"
                       type="button"
                       @click="style.optionColor = c"
-                      class="w-4 h-4 rounded border transition-all cursor-pointer shadow-2xs hover:scale-110"
+                      class="w-4 h-4 shrink-0 rounded border transition-all cursor-pointer shadow-2xs hover:scale-110"
                       :class="style.optionColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 scale-110' : 'border-slate-300'"
                       :style="{ backgroundColor: c }"
                       :title="c"
@@ -587,22 +749,22 @@
               </div>
 
               <!-- 2. Badge Box / Shape Background Color -->
-              <div class="flex items-center justify-between gap-2 bg-white border border-slate-200/80 px-2.5 py-1.5 rounded-lg">
-                <span class="text-[11px] font-semibold text-slate-700">Badge Box Color</span>
-                <div class="flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200/80 px-2.5 py-1.5 rounded-lg">
+                <span class="text-[11px] font-semibold text-slate-700 shrink-0">Badge Box Color</span>
+                <div class="flex items-center gap-1.5 flex-wrap">
                   <input 
                     v-model="style.optionBadgeBgColor" 
                     type="color" 
-                    class="w-5 h-5 rounded border border-slate-300 cursor-pointer p-0 bg-white" 
+                    class="w-5 h-5 shrink-0 rounded border border-slate-300 cursor-pointer p-0 bg-white" 
                     title="Pick Custom Badge Box Shape Color"
                   />
-                  <div class="flex items-center gap-1">
+                  <div class="flex items-center gap-1 flex-wrap">
                     <button
                       v-for="c in ['#1f2937', '#000000', '#d97706', '#dc2626', '#2563eb', '#16a34a', '#ffffff']"
                       :key="'desk-badge-bg-' + c"
                       type="button"
                       @click="style.optionBadgeBgColor = c"
-                      class="w-4 h-4 rounded border transition-all cursor-pointer shadow-2xs hover:scale-110"
+                      class="w-4 h-4 shrink-0 rounded border transition-all cursor-pointer shadow-2xs hover:scale-110"
                       :class="style.optionBadgeBgColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 scale-110' : 'border-slate-300'"
                       :style="{ backgroundColor: c }"
                       :title="c"
@@ -612,22 +774,22 @@
               </div>
 
               <!-- 3. Badge Letter Text Color (A, B, C, D) -->
-              <div class="flex items-center justify-between gap-2 bg-white border border-slate-200/80 px-2.5 py-1.5 rounded-lg">
-                <span class="text-[11px] font-semibold text-slate-700">Letter Color (A,B,C,D)</span>
-                <div class="flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200/80 px-2.5 py-1.5 rounded-lg">
+                <span class="text-[11px] font-semibold text-slate-700 shrink-0">Letter Color (A,B,C,D)</span>
+                <div class="flex items-center gap-1.5 flex-wrap">
                   <input 
                     v-model="style.optionBadgeTextColor" 
                     type="color" 
-                    class="w-5 h-5 rounded border border-slate-300 cursor-pointer p-0 bg-white" 
+                    class="w-5 h-5 shrink-0 rounded border border-slate-300 cursor-pointer p-0 bg-white" 
                     title="Pick Custom Badge Letter Color"
                   />
-                  <div class="flex items-center gap-1">
+                  <div class="flex items-center gap-1 flex-wrap">
                     <button
                       v-for="c in ['#ffffff', '#000000', '#fef08a', '#f59e0b', '#93c5fd']"
                       :key="'desk-badge-txt-' + c"
                       type="button"
                       @click="style.optionBadgeTextColor = c"
-                      class="w-4 h-4 rounded border transition-all cursor-pointer shadow-2xs hover:scale-110"
+                      class="w-4 h-4 shrink-0 rounded border transition-all cursor-pointer shadow-2xs hover:scale-110"
                       :class="style.optionBadgeTextColor.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 scale-110' : 'border-slate-300'"
                       :style="{ backgroundColor: c }"
                       :title="c"
@@ -857,13 +1019,13 @@
               </div>
 
               <!-- 2. Timer Color Picker & Presets -->
-              <div class="flex items-center justify-between gap-3 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
-                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Timer Color</span>
-                <div class="flex items-center gap-2">
+              <div class="flex flex-wrap items-center justify-between gap-2 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0">Timer Color</span>
+                <div class="flex items-center gap-2 flex-wrap">
                   <input 
                     v-model="timerConfig.color" 
                     type="color" 
-                    class="w-7 h-7 rounded-md border border-slate-300 cursor-pointer p-0 bg-white" 
+                    class="w-7 h-7 shrink-0 rounded-md border border-slate-300 cursor-pointer p-0 bg-white" 
                     title="Pick Any Custom Color"
                   />
                   <div class="flex items-center gap-1 flex-wrap">
@@ -872,7 +1034,7 @@
                       :key="'desk-tc-' + c"
                       type="button"
                       @click="timerConfig.color = c"
-                      class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs hover:scale-105"
+                      class="w-5 h-5 shrink-0 rounded-md border transition-all cursor-pointer shadow-2xs hover:scale-105"
                       :class="timerConfig.color.toLowerCase() === c.toLowerCase() ? 'ring-2 ring-amber-500 scale-110 shadow-xs' : 'border-slate-300'"
                       :style="{ backgroundColor: c }"
                       :title="c"
@@ -966,22 +1128,22 @@
               </div>
 
               <!-- Logo Color Picker (For SVG Emblem) -->
-              <div class="flex items-center justify-between gap-3 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
-                <span class="text-xs font-bold text-slate-700 shrink-0 w-28 whitespace-nowrap">Logo Color</span>
-                <div class="flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center justify-between gap-2 bg-white/90 border border-amber-200/70 px-3 py-2 rounded-xl">
+                <span class="text-xs font-bold text-slate-700 shrink-0">Logo Color</span>
+                <div class="flex items-center gap-1.5 flex-wrap">
                   <input 
                     v-model="logoConfig.color" 
                     type="color" 
-                    class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0 bg-white" 
+                    class="w-6 h-6 shrink-0 rounded-md border border-slate-300 cursor-pointer p-0 bg-white" 
                     title="Pick Custom Logo Color"
                   />
-                  <div class="flex items-center gap-1">
+                  <div class="flex items-center gap-1 flex-wrap">
                     <button
                       v-for="lc in ['#ffffff', '#000000', '#d97706', '#dc2626', '#2563eb', '#10b981', '#a855f7']"
                       :key="'desk-logo-col-' + lc"
                       type="button"
                       @click="logoConfig.color = lc"
-                      class="w-5 h-5 rounded-md border transition-all cursor-pointer shadow-2xs hover:scale-105"
+                      class="w-5 h-5 shrink-0 rounded-md border transition-all cursor-pointer shadow-2xs hover:scale-105"
                       :class="logoConfig.color.toLowerCase() === lc.toLowerCase() ? 'ring-2 ring-amber-500 scale-110 shadow-xs' : 'border-slate-300'"
                       :style="{ backgroundColor: lc }"
                       :title="lc"
@@ -1220,7 +1382,7 @@
       <!-- Tab 1: Q/A -->
       <button 
         type="button"
-        @click="mobileTab = 'qa'"
+        @click="setMobileTab('qa')"
         class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer select-none active:scale-95"
         :class="mobileTab === 'qa' ? 'text-amber-600 font-extrabold' : 'text-slate-500 font-medium hover:text-slate-700'"
       >
@@ -1233,7 +1395,7 @@
       <!-- Tab 2: Size -->
       <button 
         type="button"
-        @click="mobileTab = 'size'"
+        @click="setMobileTab('size')"
         class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer select-none active:scale-95"
         :class="mobileTab === 'size' ? 'text-amber-600 font-extrabold' : 'text-slate-500 font-medium hover:text-slate-700'"
       >
@@ -1246,7 +1408,7 @@
       <!-- Tab 3: Settings -->
       <button 
         type="button"
-        @click="mobileTab = 'settings'"
+        @click="setMobileTab('settings')"
         class="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all cursor-pointer select-none active:scale-95"
         :class="mobileTab === 'settings' ? 'text-amber-600 font-extrabold' : 'text-slate-500 font-medium hover:text-slate-700'"
       >
@@ -1610,6 +1772,26 @@ const activeTab = ref<'question' | 'settings'>('question');
 // Mobile Navigation State ('size' | 'qa' | 'settings')
 const mobileTab = ref<'size' | 'qa' | 'settings'>('qa');
 const activeSizeTarget = ref<'border' | 'type' | 'question' | 'option'>('type');
+const isDesktop = ref(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
+
+const updateDesktop = () => {
+  if (typeof window !== 'undefined') {
+    isDesktop.value = window.innerWidth >= 1024;
+  }
+};
+
+function setMobileTab(tab: 'size' | 'qa' | 'settings') {
+  mobileTab.value = tab;
+  if (typeof window !== 'undefined') {
+    const panel = document.getElementById('controls-panel');
+    if (panel) {
+      const rect = panel.getBoundingClientRect();
+      if (rect.top < 60 || rect.top > window.innerHeight) {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+}
 
 const currentDimensions = computed(() => {
   if (selectedRatio.value === '9:16') {
@@ -1722,8 +1904,9 @@ function setActiveQuestion(idx: number) {
 
 function selectQuestionAndScroll(idx: number) {
   setActiveQuestion(idx);
-  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
-  const targetId = isDesktop ? `question-card-${idx}` : `mob-question-card-${idx}`;
+  activeTab.value = 'question';
+  mobileTab.value = 'qa';
+  const targetId = `question-card-${idx}`;
   const el = document.getElementById(targetId);
   if (el) {
     isManualScrolling = true;
@@ -1912,9 +2095,8 @@ function onWindowScroll() {
     return;
   }
 
-  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
-  const prefix = isDesktop ? 'question-card-' : 'mob-question-card-';
-  const targetLine = isDesktop ? 240 : 350;
+  const prefix = 'question-card-';
+  const targetLine = isDesktop.value ? 240 : 350;
   let bestIdx = activeQuestionIndex.value;
   let minDistance = Infinity;
 
@@ -2726,6 +2908,10 @@ function testAnimationSequence() {
 }
 
 onMounted(async () => {
+  // Listen for window resize to handle mobile vs desktop layout seamlessly
+  updateDesktop();
+  window.addEventListener('resize', updateDesktop, { passive: true });
+
   // Listen for window scroll to synchronize preview with questions
   window.addEventListener('scroll', onWindowScroll, { passive: true });
   window.addEventListener('mousemove', onWindowMouseMove);
@@ -2765,6 +2951,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  window.removeEventListener('resize', updateDesktop);
   window.removeEventListener('scroll', onWindowScroll);
   window.removeEventListener('mousemove', onWindowMouseMove);
   window.removeEventListener('mouseup', onWindowMouseUp);
