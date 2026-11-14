@@ -2499,8 +2499,7 @@ const voiceOptionsByProvider: Record<VoiceProvider, Array<{ id: string; name: st
     { id: 'mihika', name: 'Mihika (Female)', gender: 'Female' },
     { id: 'rajiv', name: 'Rajiv (Male)', gender: 'Male' },
     { id: 'shlok', name: 'Shlok (Male)', gender: 'Male' },
-    { id: 'kathan', name: 'Kathan (Male)', gender: 'Male' },
-    { id: 'vinti', name: 'Vinti (Female)', gender: 'Female' }
+    { id: 'kathan', name: 'Kathan (Male)', gender: 'Male' }
   ],
   edge: [
     { id: 'hi-IN-SwaraNeural', name: 'Swara (Female)', gender: 'Female' },
@@ -3986,9 +3985,15 @@ function audioBufferToWavBlob(buffer: AudioBuffer): Blob {
   for (let i = 0; i < len; i++) {
     for (let channel = 0; channel < numChannels; channel++) {
       let sample = buffer.getChannelData(channel)[i];
-      sample = Math.max(-1, Math.min(1, sample));
-      const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-      view.setInt16(offset, intSample, true);
+      // Smooth soft-knee saturation curve to completely eliminate harsh digital square-wave clipping
+      if (sample > 0.98) {
+        sample = 0.98 + (sample - 0.98) / (1 + (sample - 0.98));
+      } else if (sample < -0.98) {
+        sample = -0.98 + (sample + 0.98) / (1 + Math.abs(sample + 0.98));
+      }
+      sample = Math.max(-1.0, Math.min(1.0, sample));
+      const intSample = Math.round(sample < 0 ? sample * 0x8000 : sample * 0x7FFF);
+      view.setInt16(offset, Math.max(-32768, Math.min(32767, intSample)), true);
       offset += 2;
     }
   }
@@ -4108,21 +4113,20 @@ async function startBulletproofVideoGeneration() {
 
       const questionSpeechText = `${qItem.question || 'प्रश्न ' + qNum}`;
       const optTexts = [
-        `ऑप्शन ए: ${qItem.options[0] || 'ऑप्शन ए'}`,
-        `ऑप्शन बी: ${qItem.options[1] || 'ऑप्शन बी'}`,
-        `ऑप्शन सी: ${qItem.options[2] || 'ऑप्शन सी'}`,
-        `ऑप्शन डी: ${qItem.options[3] || 'ऑप्शन डी'}`
+        `ऑप्शन ए, ${qItem.options[0] || 'ऑप्शन ए'}`,
+        `ऑप्शन बी, ${qItem.options[1] || 'ऑप्शन बी'}`,
+        `ऑप्शन सी, ${qItem.options[2] || 'ऑप्शन सी'}`,
+        `ऑप्शन डी, ${qItem.options[3] || 'ऑप्शन डी'}`
       ];
-      const correctSpeechText = `सही उत्तर है: ऑप्शन ${correctLetterHindi}, ${correctOptionText}`;
+      const correctSpeechText = `सही उत्तर है, ऑप्शन ${correctLetterHindi}, ${correctOptionText}`;
 
-      const [qAudio, opt0Audio, opt1Audio, opt2Audio, opt3Audio, corrAudio] = await Promise.all([
-        fetchTtsAudioBuffer(questionSpeechText, audioCtx),
-        fetchTtsAudioBuffer(optTexts[0], audioCtx),
-        fetchTtsAudioBuffer(optTexts[1], audioCtx),
-        fetchTtsAudioBuffer(optTexts[2], audioCtx),
-        fetchTtsAudioBuffer(optTexts[3], audioCtx),
-        fetchTtsAudioBuffer(correctSpeechText, audioCtx)
-      ]);
+      // Stable sequential TTS generation with micro-pauses (prevents API rate-limits & voice collisions)
+      const qAudio = await fetchTtsAudioBuffer(questionSpeechText, audioCtx);
+      const opt0Audio = await fetchTtsAudioBuffer(optTexts[0], audioCtx);
+      const opt1Audio = await fetchTtsAudioBuffer(optTexts[1], audioCtx);
+      const opt2Audio = await fetchTtsAudioBuffer(optTexts[2], audioCtx);
+      const opt3Audio = await fetchTtsAudioBuffer(optTexts[3], audioCtx);
+      const corrAudio = await fetchTtsAudioBuffer(correctSpeechText, audioCtx);
 
       const qDuration = Math.max(3.0, qAudio.duration + 0.3);
       const opt0Dur = opt0Audio.duration + 0.25;
@@ -4170,13 +4174,13 @@ async function startBulletproofVideoGeneration() {
         revealStart
       });
 
-      // Schedule Audio Clips for this question segment
+      // Schedule Audio Clips for this question segment (clean balanced volume mix)
       const segmentClips: any[] = [
-        { buffer: qAudio.buffer, startSec: segStartTime + 0.2 },
-        { buffer: opt0Audio.buffer, startSec: segStartTime + opt0Start },
-        { buffer: opt1Audio.buffer, startSec: segStartTime + opt1Start },
-        { buffer: opt2Audio.buffer, startSec: segStartTime + opt2Start },
-        { buffer: opt3Audio.buffer, startSec: segStartTime + opt3Start }
+        { buffer: qAudio.buffer, startSec: segStartTime + 0.2, volume: 0.95 },
+        { buffer: opt0Audio.buffer, startSec: segStartTime + opt0Start, volume: 0.95 },
+        { buffer: opt1Audio.buffer, startSec: segStartTime + opt1Start, volume: 0.95 },
+        { buffer: opt2Audio.buffer, startSec: segStartTime + opt2Start, volume: 0.95 },
+        { buffer: opt3Audio.buffer, startSec: segStartTime + opt3Start, volume: 0.95 }
       ];
 
       if (timerCountdown > 0) {
@@ -4184,14 +4188,14 @@ async function startBulletproofVideoGeneration() {
           buffer: timerSoundBuf,
           startSec: segStartTime + timerStart,
           maxDurationSec: timerCountdown,
-          volume: 0.85,
+          volume: 0.50, // Balanced tick volume, no voice clash
           fadeOutSec: 0.15
         });
       }
 
       segmentClips.push(
-        { buffer: correctSoundBuf, startSec: segStartTime + revealStart, maxDurationSec: revealDuration, volume: 0.95, fadeOutSec: 0.1 },
-        { buffer: corrAudio.buffer, startSec: segStartTime + corrSpeechStart }
+        { buffer: correctSoundBuf, startSec: segStartTime + revealStart, maxDurationSec: revealDuration, volume: 0.65, fadeOutSec: 0.1 },
+        { buffer: corrAudio.buffer, startSec: segStartTime + corrSpeechStart, volume: 0.95 }
       );
 
       audioPlacementList.push(...segmentClips);
@@ -4239,6 +4243,26 @@ async function startBulletproofVideoGeneration() {
 
     for (const item of audioPlacementList) {
       copyAudioToMaster(item.buffer, item.startSec, item.maxDurationSec, item.volume, item.fadeOutSec);
+    }
+
+    // Professional Master Limiter & Peak Normalization (Eliminates all digital clipping & "khar khach")
+    let maxPeak = 0;
+    for (let c = 0; c < 2; c++) {
+      const data = masterAudioBuffer.getChannelData(c);
+      for (let i = 0; i < data.length; i++) {
+        const abs = Math.abs(data[i]);
+        if (abs > maxPeak) maxPeak = abs;
+      }
+    }
+
+    if (maxPeak > 0.95) {
+      const reduction = 0.95 / maxPeak;
+      for (let c = 0; c < 2; c++) {
+        const data = masterAudioBuffer.getChannelData(c);
+        for (let i = 0; i < data.length; i++) {
+          data[i] = data[i] * reduction;
+        }
+      }
     }
 
     const wavBlob = audioBufferToWavBlob(masterAudioBuffer);

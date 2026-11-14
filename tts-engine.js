@@ -63,50 +63,69 @@ function splitTextIntoSafeChunks(rawText, maxLen = 1500) {
   return chunks;
 }
 
-// Extract PCM bytes from Speechify WAV buffer
+// Extract PCM bytes from Speechify WAV buffer with safe 16-bit boundary
 function extractPcm(wavBuf) {
+  if (!wavBuf || wavBuf.length < 44) return Buffer.alloc(0);
   let offset = 12;
   while (offset + 8 <= wavBuf.length) {
     const chunkId = wavBuf.subarray(offset, offset + 4).toString('ascii');
     const chunkSize = wavBuf.readUInt32LE(offset + 4);
-    if (chunkId === 'data' || chunkSize === 4294967295) {
-      return wavBuf.subarray(offset + 8);
+    if (chunkId === 'data') {
+      let pcm = wavBuf.subarray(offset + 8);
+      if (chunkSize !== 4294967295 && chunkSize > 0 && chunkSize < pcm.length) {
+        pcm = pcm.subarray(0, chunkSize);
+      }
+      const safeLen = pcm.length - (pcm.length % 2);
+      return pcm.subarray(0, safeLen);
     }
+    if (chunkSize === 4294967295) break;
     offset += 8 + chunkSize + (chunkSize % 2);
   }
-  return wavBuf.subarray(78);
+  const fallback = wavBuf.subarray(78);
+  const safeLen = fallback.length - (fallback.length % 2);
+  return fallback.subarray(0, safeLen);
 }
 
-// Build standard 44-byte WAV container from PCM buffers
+// Build standard, 100% compliant 44-byte WAV container from PCM buffers
 function buildCleanWav(pcmBuffers, sampleRate = 24000) {
-  const totalPcmLength = pcmBuffers.reduce((sum, b) => sum + b.length, 0);
+  const combined = Buffer.concat(pcmBuffers);
+  const safePcmLength = combined.length - (combined.length % 2);
   const header = Buffer.alloc(44);
 
   header.write('RIFF', 0);
-  header.writeUInt32LE(36 + totalPcmLength, 4);
+  header.writeUInt32LE(36 + safePcmLength, 4);
   header.write('WAVE', 8);
   header.write('fmt ', 12);
   header.writeUInt32LE(16, 16);
-  header.writeUInt16LE(1, 20); // PCM format
-  header.writeUInt16LE(1, 22); // Mono channel
+  header.writeUInt16LE(1, 20); // PCM format (1)
+  header.writeUInt16LE(1, 22); // Mono channel (1)
   header.writeUInt32LE(sampleRate, 24);
-  header.writeUInt32LE(sampleRate * 2, 28);
-  header.writeUInt16LE(2, 32);
-  header.writeUInt16LE(16, 34);
+  header.writeUInt32LE(sampleRate * 2, 28); // byteRate = sampleRate * 1 * 2
+  header.writeUInt16LE(2, 32); // blockAlign = 2
+  header.writeUInt16LE(16, 34); // bitsPerSample = 16
   header.write('data', 36);
-  header.writeUInt32LE(totalPcmLength, 40);
+  header.writeUInt32LE(safePcmLength, 40);
 
-  return Buffer.concat([header, ...pcmBuffers]);
+  return Buffer.concat([header, combined.subarray(0, safePcmLength)]);
 }
 
 // Single Speechify chunk HTTP request
 function callSpeechifyChunk(chunkText, voice = 'mihika') {
   return new Promise((resolve, reject) => {
-    const clean = chunkText.replace(/^\s*<speak>\s*/i, '').replace(/\s*<\/speak>\s*$/i, '').trim();
+    // Clean text: convert colons to commas for natural Hindi pauses, remove SSML markup
+    const clean = chunkText
+      .replace(/<\/?speak>/gi, '')
+      .replace(/:/g, ',')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const targetVoice = (voice || 'mihika').toLowerCase();
+    const validVoice = (targetVoice === 'vinti' || !targetVoice) ? 'mihika' : targetVoice;
+
     const payload = JSON.stringify({
       text: `<speak>${clean}</speak>`,
       isDefaultText: true,
-      voice: (voice || 'mihika').toLowerCase(),
+      voice: validVoice,
       language: 'hi-IN',
       pageUrl: 'https://speechify.com/text-to-speech-online/',
       escape: false
@@ -152,15 +171,16 @@ function callSpeechifyChunk(chunkText, voice = 'mihika') {
 export async function getFullSpeechifyAudio(text, voice = 'mihika') {
   const chunks = splitTextIntoSafeChunks(text, 1500);
   if (!chunks.length) return Buffer.alloc(0);
-  if (chunks.length === 1) {
-    return await callSpeechifyChunk(chunks[0], voice);
-  }
 
   const pcmBuffers = [];
   for (const chunk of chunks) {
     const rawWav = await callSpeechifyChunk(chunk, voice);
-    pcmBuffers.push(extractPcm(rawWav));
+    const pcm = extractPcm(rawWav);
+    if (pcm && pcm.length > 0) {
+      pcmBuffers.push(pcm);
+    }
   }
+  // ALWAYS rebuild standard, valid 44-byte WAV container with exact length (fixes crackle/pops)
   return buildCleanWav(pcmBuffers, 24000);
 }
 
@@ -273,15 +293,22 @@ export async function synthesizeTts({ text, provider = 'speechify', voice = 'mih
       const audio = await getFullSpeechifyAudio(text, voice || 'mihika');
       return { audio, contentType: 'audio/wav' };
     } catch (err) {
-      console.warn('[TTS] Speechify temporarily unavailable, falling back to Edge TTS:', err.message);
+      console.warn('[TTS] Speechify attempt 1 warning:', err.message, '- retrying once...');
       try {
-        const fallbackEdge = (voice === 'rajiv' || voice === 'shlok') ? 'hi-IN-MadhurNeural' : 'hi-IN-SwaraNeural';
-        const audio = await getFullEdgeAudio(text, fallbackEdge);
-        return { audio, contentType: 'audio/mpeg' };
-      } catch (e2) {
-        console.warn('[TTS] Edge fallback failed, using Google TTS:', e2.message);
-        const audio = await getFullGoogleTtsAudio(text, lang);
-        return { audio, contentType: 'audio/mpeg' };
+        await new Promise(r => setTimeout(r, 350));
+        const audio = await getFullSpeechifyAudio(text, voice || 'mihika');
+        return { audio, contentType: 'audio/wav' };
+      } catch (retryErr) {
+        console.warn('[TTS] Speechify fallback to Edge Neural:', retryErr.message);
+        try {
+          const fallbackEdge = (voice === 'rajiv' || voice === 'shlok' || voice === 'kathan') ? 'hi-IN-MadhurNeural' : 'hi-IN-SwaraNeural';
+          const audio = await getFullEdgeAudio(text, fallbackEdge);
+          return { audio, contentType: 'audio/mpeg' };
+        } catch (e2) {
+          console.warn('[TTS] Edge fallback failed, using Google TTS:', e2.message);
+          const audio = await getFullGoogleTtsAudio(text, lang);
+          return { audio, contentType: 'audio/mpeg' };
+        }
       }
     }
   }
